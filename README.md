@@ -1,2 +1,2 @@
-# dsb-a3-forms
+# Nuget library for Altinn 3 forms
 DSB common code for Altinn 3 forms

@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DsbA3Forms", "DsbA3Forms\DsbA3Forms.csproj", "{23917B71-FDE4-4B5F-89B1-4B9032FE127E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DsbA3Forms.Tests", "DsbA3Forms.Tests\DsbA3Forms.Tests.csproj", "{43B3196B-78B1-4451-B15E-BAB0E2C35016}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{23917B71-FDE4-4B5F-89B1-4B9032FE127E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23917B71-FDE4-4B5F-89B1-4B9032FE127E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23917B71-FDE4-4B5F-89B1-4B9032FE127E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23917B71-FDE4-4B5F-89B1-4B9032FE127E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43B3196B-78B1-4451-B15E-BAB0E2C35016}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43B3196B-78B1-4451-B15E-BAB0E2C35016}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43B3196B-78B1-4451-B15E-BAB0E2C35016}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43B3196B-78B1-4451-B15E-BAB0E2C35016}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9B2FAE12-99A0-4A13-95AE-88AAEB132DD1}
+	EndGlobalSection
+EndGlobal

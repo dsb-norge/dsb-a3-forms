@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "DsbA3Forms": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:57980;http://localhost:57981"
+    }
+  }
+}

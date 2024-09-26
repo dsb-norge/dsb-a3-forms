@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <OutputType>Library</OutputType>
+    
+    <!-- NuGet package properties -->
+    <IsPackable>true</IsPackable>
+    <PackageId>DsbA3Forms</PackageId>
+    <PackageTags>Dsb;AltinnForms</PackageTags>
+    <Description>
+      Package containing reusable code for Altinn 3 forms managed by DSB.
+    </Description>
+    <Authors>DSB</Authors>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>
+      https://github.com/dsb-norge/dsb-a3-forms
+    </RepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Altinn.App.Api" Version="8.3.3">
+      <CopyToOutputDirectory>lib\$(TargetFramework)\*.xml</CopyToOutputDirectory>
+    </PackageReference>
+    <PackageReference Include="Altinn.App.Core" Version="8.3.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.3" />
+  </ItemGroup>
+</Project>

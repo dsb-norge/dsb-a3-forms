@@ -1,0 +1,247 @@
+﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\NUnit.4.2.2\build\NUnit.props" Condition="Exists('packages\NUnit.4.2.2\build\NUnit.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7226CCEB-37AF-4EBD-BD9D-4216F0FF2E94}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <NoStandardLibraries>false</NoStandardLibraries>
+    <AssemblyName>ClassLibrary</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <LangVersion>latest</LangVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>dsb_a3_forms</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=8.0.0.1, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.DependencyInjection.Abstractions.8.0.1\lib\net462\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=8.0.0.1, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Extensions.Logging.Abstractions.8.0.1\lib\net462\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=4.2.2.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>packages\NUnit.4.2.2\lib\net462\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework.legacy, Version=4.2.2.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>packages\NUnit.4.2.2\lib\net462\nunit.framework.legacy.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encodings.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Text.Encodings.Web.8.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=8.0.0.4, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Text.Json.8.0.4\lib\net462\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".gitignore" />
+    <Content Include=".git\ms-persist.xml" />
+    <Content Include="src\DsbA3Forms\bin\Debug\net8.0\DsbA3Forms.dll" />
+    <Content Include="src\DsbA3Forms\bin\Debug\net8.0\DsbA3Forms.pdb" />
+    <Content Include="src\DsbA3Forms\bin\Release\net8.0\DsbA3Forms.dll" />
+    <Content Include="src\DsbA3Forms\bin\Release\net8.0\DsbA3Forms.pdb" />
+    <Content Include="src\DsbA3Forms\obj\Debug\net8.0\DsbA3Forms.csproj.FileListAbsolute.txt" />
+    <Content Include="src\DsbA3Forms\obj\Debug\net8.0\DsbA3Forms.dll" />
+    <Content Include="src\DsbA3Forms\obj\Debug\net8.0\DsbA3Forms.pdb" />
+    <Content Include="src\DsbA3Forms\obj\Debug\net8.0\refint\DsbA3Forms.dll" />
+    <Content Include="src\DsbA3Forms\obj\Debug\net8.0\ref\DsbA3Forms.dll" />
+    <Content Include="src\DsbA3Forms\obj\Release\net8.0\DsbA3Forms.csproj.FileListAbsolute.txt" />
+    <Content Include="src\DsbA3Forms\obj\Release\net8.0\DsbA3Forms.dll" />
+    <Content Include="src\DsbA3Forms\obj\Release\net8.0\DsbA3Forms.pdb" />
+    <Content Include="src\DsbA3Forms\obj\Release\net8.0\refint\DsbA3Forms.dll" />
+    <Content Include="src\DsbA3Forms\obj\Release\net8.0\ref\DsbA3Forms.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".git\COMMIT_EDITMSG" />
+    <None Include=".git\config" />
+    <None Include=".git\description" />
+    <None Include=".git\FETCH_HEAD" />
+    <None Include=".git\HEAD" />
+    <None Include=".git\hooks\applypatch-msg.sample" />
+    <None Include=".git\hooks\commit-msg.sample" />
+    <None Include=".git\hooks\fsmonitor-watchman.sample" />
+    <None Include=".git\hooks\post-update.sample" />
+    <None Include=".git\hooks\pre-applypatch.sample" />
+    <None Include=".git\hooks\pre-commit.sample" />
+    <None Include=".git\hooks\pre-merge-commit.sample" />
+    <None Include=".git\hooks\pre-push.sample" />
+    <None Include=".git\hooks\pre-rebase.sample" />
+    <None Include=".git\hooks\pre-receive.sample" />
+    <None Include=".git\hooks\prepare-commit-msg.sample" />
+    <None Include=".git\hooks\push-to-checkout.sample" />
+    <None Include=".git\hooks\sendemail-validate.sample" />
+    <None Include=".git\hooks\update.sample" />
+    <None Include=".git\index" />
+    <None Include=".git\info\exclude" />
+    <None Include=".git\logs\HEAD" />
+    <None Include=".git\logs\refs\heads\main" />
+    <None Include=".git\logs\refs\remotes\origin\HEAD" />
+    <None Include=".git\logs\refs\remotes\origin\main" />
+    <None Include=".git\objects\01\1d8fb367f92d19e3038c1e9523e91f536858cf" />
+    <None Include=".git\objects\08\8ec19569ef7931851759cfd85e8f6107c76263" />
+    <None Include=".git\objects\0a\6a8391df5bf7053c22b9c27871d2a07f586e0f" />
+    <None Include=".git\objects\27\db1b3ca3c3b5500ce86f65cfc6f51730e55ce6" />
+    <None Include=".git\objects\2b\cb17687a132ac60e8a936c88b6a1e3fb096416" />
+    <None Include=".git\objects\3a\cb8dd793c113668e52ce924e152b176f2495d9" />
+    <None Include=".git\objects\4b\6cd318f7d7231395dc36607258ac2ad01bebd7" />
+    <None Include=".git\objects\4f\719608f9bd2f07d9055077841bd500f01debe8" />
+    <None Include=".git\objects\50\bf49e6c013f9aba759c5e83564cc6877fa8a3d" />
+    <None Include=".git\objects\67\1cb5bb09821d10b07daf2d2c98468f0ecd6040" />
+    <None Include=".git\objects\67\2c5810a7ae1b8b86cd352ba5cdb9949cbc619b" />
+    <None Include=".git\objects\6d\02a61abe6364f12fb1e91bfa9e0813192764c7" />
+    <None Include=".git\objects\7b\28e1f0b7330ea587002a3d84cd48f391e12122" />
+    <None Include=".git\objects\95\9540c295a1b433f95a5915974c7db51fc2f8f9" />
+    <None Include=".git\objects\c6\d5f420e5c9ba98ab75660fa2009b78d8d4d58a" />
+    <None Include=".git\objects\cb\19509acdea964d0487f8f63c78c85a51f8d9b1" />
+    <None Include=".git\objects\cc\8654b49b51ab3200c2ad52564fb8d6b45feac8" />
+    <None Include=".git\objects\d7\e0a91772263fbeaeb27f8c5150eaacf449746b" />
+    <None Include=".git\objects\db\29cbe7cdad82347657386d97790a67ff7988f6" />
+    <None Include=".git\objects\dc\4887009c4cc3aad366baa052aa4ee4419ce14c" />
+    <None Include=".git\objects\e0\bb9a769265714411eb1dfdd3728c65137e154a" />
+    <None Include=".git\objects\e6\9de29bb2d1d6434b8b29ae775ad8c2e48c5391" />
+    <None Include=".git\objects\e6\e893d395f9fddd832882ca0c619652d7d176fa" />
+    <None Include=".git\objects\e9\8865e6551e2794ccb29a24e963242f03c25043" />
+    <None Include=".git\objects\fa\71b7ae6a34999a3f96c40d9a0b870b311d11dd" />
+    <None Include=".git\objects\fe\1e64a58ff3329cccab843a92234f757a0ee9e9" />
+    <None Include=".git\objects\pack\pack-9f1851efbe6f54dadb74833dc018c91a11b90617.idx" />
+    <None Include=".git\objects\pack\pack-9f1851efbe6f54dadb74833dc018c91a11b90617.pack" />
+    <None Include=".git\objects\pack\pack-9f1851efbe6f54dadb74833dc018c91a11b90617.rev" />
+    <None Include=".git\packed-refs" />
+    <None Include=".git\refs\heads\main" />
+    <None Include=".git\refs\remotes\origin\HEAD" />
+    <None Include=".git\refs\remotes\origin\main" />
+    <None Include=".vs\dsb-a3-forms\CopilotIndices\0.2.1653.9816\CodeChunks.db" />
+    <None Include=".vs\dsb-a3-forms\CopilotIndices\0.2.1653.9816\SemanticSymbols.db" />
+    <None Include=".vs\dsb-a3-forms\CopilotIndices\0.2.1653.9816\SemanticSymbols.db-shm" />
+    <None Include=".vs\dsb-a3-forms\CopilotIndices\0.2.1653.9816\SemanticSymbols.db-wal" />
+    <None Include=".vs\dsb-a3-forms\DesignTimeBuild\.dtbcache.v2" />
+    <None Include=".vs\dsb-a3-forms\FileContentIndex\0ae731b6-e77c-4ff4-ab83-53dd528c0b6a.vsidx" />
+    <None Include=".vs\dsb-a3-forms\FileContentIndex\27d237bc-4688-44e9-b82b-19f8d44e372f.vsidx" />
+    <None Include=".vs\dsb-a3-forms\FileContentIndex\5b9343fc-0810-4b82-a1b1-0833a8b7848e.vsidx" />
+    <None Include=".vs\dsb-a3-forms\FileContentIndex\f002f374-faf5-4b77-ad47-ee953eab0d37.vsidx" />
+    <None Include=".vs\dsb-a3-forms\FileContentIndex\f2e03bd3-02a5-4f45-9bde-b51e8e3beaa9.vsidx" />
+    <None Include=".vs\dsb-a3-forms\v17\.futdcache.v2" />
+    <None Include=".vs\dsb-a3-forms\v17\.suo" />
+    <None Include=".vs\dsb-a3-forms\v17\.wsuo" />
+    <None Include=".vs\dsb-a3-forms\v17\DocumentLayout.backup.json" />
+    <None Include=".vs\dsb-a3-forms\v17\DocumentLayout.json" />
+    <None Include=".vs\ProjectEvaluation\dsb-a3-forms.metadata.v9.bin" />
+    <None Include=".vs\ProjectEvaluation\dsb-a3-forms.projects.v9.bin" />
+    <None Include=".vs\ProjectEvaluation\dsb-a3-forms.strings.v9.bin" />
+    <None Include=".vs\slnx.sqlite" />
+    <None Include=".vs\VSWorkspaceState.json" />
+    <None Include="packages.config" />
+    <None Include="README.md" />
+    <None Include="src\DsbA3Forms\bin\Debug\net8.0\DsbA3Forms.deps.json" />
+    <None Include="src\DsbA3Forms\bin\Release\DsbA3Forms.1.0.0.nupkg" />
+    <None Include="src\DsbA3Forms\bin\Release\DsbA3Forms.1.0.0.snupkg" />
+    <None Include="src\DsbA3Forms\bin\Release\DsbA3Forms.1.0.0.symbols.nupkg" />
+    <None Include="src\DsbA3Forms\bin\Release\net8.0\DsbA3Forms.deps.json" />
+    <None Include="src\DsbA3Forms\DsbA3Forms.csproj" />
+    <None Include="src\DsbA3Forms\obj\Debug\net8.0\DsbA3Forms.AssemblyInfoInputs.cache" />
+    <None Include="src\DsbA3Forms\obj\Debug\net8.0\DsbA3Forms.assets.cache" />
+    <None Include="src\DsbA3Forms\obj\Debug\net8.0\DsbA3Forms.csproj.AssemblyReference.cache" />
+    <None Include="src\DsbA3Forms\obj\Debug\net8.0\DsbA3Forms.csproj.CoreCompileInputs.cache" />
+    <None Include="src\DsbA3Forms\obj\Debug\net8.0\DsbA3Forms.GeneratedMSBuildEditorConfig.editorconfig" />
+    <None Include="src\DsbA3Forms\obj\Debug\net8.0\DsbA3Forms.sourcelink.json" />
+    <None Include="src\DsbA3Forms\obj\DsbA3Forms.csproj.nuget.dgspec.json" />
+    <None Include="src\DsbA3Forms\obj\DsbA3Forms.csproj.nuget.g.props" />
+    <None Include="src\DsbA3Forms\obj\DsbA3Forms.csproj.nuget.g.targets" />
+    <None Include="src\DsbA3Forms\obj\project.assets.json" />
+    <None Include="src\DsbA3Forms\obj\project.nuget.cache" />
+    <None Include="src\DsbA3Forms\obj\Release\DsbA3Forms.1.0.0.nuspec" />
+    <None Include="src\DsbA3Forms\obj\Release\DsbA3Forms.1.0.0.symbols.nuspec" />
+    <None Include="src\DsbA3Forms\obj\Release\net8.0\DsbA3Forms.AssemblyInfoInputs.cache" />
+    <None Include="src\DsbA3Forms\obj\Release\net8.0\DsbA3Forms.assets.cache" />
+    <None Include="src\DsbA3Forms\obj\Release\net8.0\DsbA3Forms.csproj.AssemblyReference.cache" />
+    <None Include="src\DsbA3Forms\obj\Release\net8.0\DsbA3Forms.csproj.CoreCompileInputs.cache" />
+    <None Include="src\DsbA3Forms\obj\Release\net8.0\DsbA3Forms.GeneratedMSBuildEditorConfig.editorconfig" />
+    <None Include="src\DsbA3Forms\obj\Release\net8.0\DsbA3Forms.sourcelink.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="src\DsbA3Forms\Clients\BringClient.cs" />
+    <Compile Include="src\DsbA3Forms\Clients\GeoNorgeClient.cs" />
+    <Compile Include="src\DsbA3Forms\Clients\IBringClient.cs" />
+    <Compile Include="src\DsbA3Forms\Clients\IGeoNorgeClient.cs" />
+    <Compile Include="src\DsbA3Forms\Clients\IInputValidatorClient.cs" />
+    <Compile Include="src\DsbA3Forms\Clients\IMunicipalityClient.cs" />
+    <Compile Include="src\DsbA3Forms\Clients\InputValidatorClient.cs" />
+    <Compile Include="src\DsbA3Forms\Clients\MunicipalityClient.cs" />
+    <Compile Include="src\DsbA3Forms\DTOs\AddressDTO.cs" />
+    <Compile Include="src\DsbA3Forms\DTOs\ContactInfoDTO.cs" />
+    <Compile Include="src\DsbA3Forms\Models\Address\Address.cs" />
+    <Compile Include="src\DsbA3Forms\Models\Address\GeoNorgeAdresse.cs" />
+    <Compile Include="src\DsbA3Forms\Models\Address\MapLocation.cs" />
+    <Compile Include="src\DsbA3Forms\Models\Address\Municipality.cs" />
+    <Compile Include="src\DsbA3Forms\Models\ContactInfo.cs" />
+    <Compile Include="src\DsbA3Forms\obj\Debug\net8.0\.NETCoreApp,Version=v8.0.AssemblyAttributes.cs" />
+    <Compile Include="src\DsbA3Forms\obj\Debug\net8.0\DsbA3Forms.AssemblyInfo.cs" />
+    <Compile Include="src\DsbA3Forms\obj\Debug\net8.0\DsbA3Forms.GlobalUsings.g.cs" />
+    <Compile Include="src\DsbA3Forms\obj\Release\net8.0\.NETCoreApp,Version=v8.0.AssemblyAttributes.cs" />
+    <Compile Include="src\DsbA3Forms\obj\Release\net8.0\DsbA3Forms.AssemblyInfo.cs" />
+    <Compile Include="src\DsbA3Forms\obj\Release\net8.0\DsbA3Forms.GlobalUsings.g.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include=".git\objects\info\" />
+    <Folder Include=".git\refs\tags\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
+  <ProjectExtensions>
+    <VisualStudio AllowExistingFolder="true" />
+  </ProjectExtensions>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\NUnit.4.2.2\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\NUnit.4.2.2\build\NUnit.props'))" />
+  </Target>
+</Project>

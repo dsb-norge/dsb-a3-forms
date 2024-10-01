@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using DsbA3Forms.Clients;
+using DsbNorge.A3Forms.Clients;
 
-namespace DsbA3Forms.Tests;
+namespace DsbNorge.A3Forms.Tests;
 
 [TestFixture]
 [Category("Integration")]

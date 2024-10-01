@@ -1,5 +1,5 @@
 #nullable enable
-namespace DsbA3Forms.Models;
+namespace DsbNorge.A3Forms.Models;
 public class ContactInfo
 {
     public string FirstName { get; set; }

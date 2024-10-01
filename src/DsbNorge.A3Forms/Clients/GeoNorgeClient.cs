@@ -1,11 +1,11 @@
 using System.Text.Json;
 using Altinn.App.Core.Extensions;
-using DsbA3Forms.Models.Address;
+using DsbNorge.A3Forms.Models.Address;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
-namespace DsbA3Forms.Clients;
+namespace DsbNorge.A3Forms.Clients;
 
 public class GeoNorgeClient : IGeoNorgeClient
 {

@@ -1,4 +1,4 @@
-namespace DsbA3Forms.Models.Address;
+namespace DsbNorge.A3Forms.Models.Address;
 public class GeoNorgeAdresseRespons
 {
     // {"metadata":{"totaltAntallTreff":0,"asciiKompatibel":true,"side":0,"sokeStreng":"sok=Bue%20T%C3%B8nsberg","viserFra":0,"viserTil":10,"treffPerSide":10},"adresser":[]}

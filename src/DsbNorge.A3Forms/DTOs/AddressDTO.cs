@@ -1,6 +1,6 @@
-using DsbA3Forms.Models.Address;
+using DsbNorge.A3Forms.Models.Address;
 
-namespace DsbA3Forms.DTOs;
+namespace DsbNorge.A3Forms.DTOs;
 public class AddressDTO
 {
     public string StreetAddress { get; set; }

@@ -1,5 +1,5 @@
 #nullable enable
-namespace DsbA3Forms.Clients;
+namespace DsbNorge.A3Forms.Clients;
 public interface IInputValidatorClient
 {
     bool ValidatePhoneNumber(string inputValue);

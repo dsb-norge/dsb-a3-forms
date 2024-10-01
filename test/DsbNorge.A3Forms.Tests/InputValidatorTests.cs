@@ -1,6 +1,6 @@
-using DsbA3Forms.Clients;
+using DsbNorge.A3Forms.Clients;
 
-namespace DsbA3Forms.Tests;
+namespace DsbNorge.A3Forms.Tests;
 public class InputValidatorTests
 {
     private InputValidatorClient _inputValidatorClient { get; set; } = null!;

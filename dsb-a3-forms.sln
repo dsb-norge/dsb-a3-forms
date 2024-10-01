@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DsbA3Forms", "src\DsbA3Forms\DsbA3Forms.csproj", "{048CF9C6-96A4-48B8-8183-0992379288C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DsbNorge.A3Forms", "src\DsbNorge.A3Forms\DsbNorge.A3Forms.csproj", "{048CF9C6-96A4-48B8-8183-0992379288C0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DsbA3Forms.Tests", "test\DsbA3Forms.Tests\DsbA3Forms.Tests.csproj", "{9A02D755-9F6E-4D38-815B-66EFBC1A741D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DsbNorge.A3Forms.Tests", "test\DsbNorge.A3Forms.Tests\DsbNorge.A3Forms.Tests.csproj", "{9A02D755-9F6E-4D38-815B-66EFBC1A741D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

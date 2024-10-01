@@ -7,8 +7,8 @@
     
     <!-- NuGet package properties -->
     <IsPackable>true</IsPackable>
-    <PackageId>DsbA3Forms</PackageId>
-    <PackageTags>Dsb;AltinnForms</PackageTags>
+    <PackageId>DsbNorge.A3Forms</PackageId>
+    <PackageTags>Dsb;Altinn;AltinnForms</PackageTags>
     <Description>
       Package containing reusable code for Altinn 3 forms managed by DSB.
     </Description>

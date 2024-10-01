@@ -1,10 +1,8 @@
 #nullable enable
-namespace DsbA3Forms.Clients
+namespace DsbA3Forms.Clients;
+public interface IInputValidatorClient
 {
-    public interface IInputValidatorClient
-    {
-        bool ValidatePhoneNumber(string inputValue);
+    bool ValidatePhoneNumber(string inputValue);
 
-        bool ValidateEmailAddress(string inputValue);
-    }
+    bool ValidateEmailAddress(string inputValue);
 }

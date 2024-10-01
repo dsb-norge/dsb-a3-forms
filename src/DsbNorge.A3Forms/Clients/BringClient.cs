@@ -3,7 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace DsbA3Forms.Clients;
+namespace DsbNorge.A3Forms.Clients;
 public class BringClient : IBringClient
 {
     HttpClient _client;

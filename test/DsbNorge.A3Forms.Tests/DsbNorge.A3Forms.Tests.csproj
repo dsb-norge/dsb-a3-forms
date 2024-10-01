@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DsbA3Forms\DsbA3Forms.csproj" />
+    <ProjectReference Include="..\..\src\DsbNorge.A3Forms\DsbNorge.A3Forms.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,7 +2,7 @@
 using System.Net.Mail;
 using System.Text.RegularExpressions;
 
-namespace DsbA3Forms.Clients;
+namespace DsbNorge.A3Forms.Clients;
 public partial class InputValidatorClient : IInputValidatorClient
 {
     public bool ValidatePhoneNumber(string inputValue)

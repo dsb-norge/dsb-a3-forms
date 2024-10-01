@@ -1,4 +1,4 @@
-namespace DsbA3Forms.Models.Address;
+namespace DsbNorge.A3Forms.Models.Address;
 public class Address
 {
     public string StreetAddress { get; set; }

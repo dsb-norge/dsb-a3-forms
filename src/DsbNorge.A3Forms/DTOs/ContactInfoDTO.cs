@@ -1,7 +1,7 @@
 #nullable enable
-using DsbA3Forms.Models;
+using DsbNorge.A3Forms.Models;
 
-namespace DsbA3Forms.DTOs;
+namespace DsbNorge.A3Forms.DTOs;
 public class ContactInfoDTO
 {
     public string FirstName { get; set; }

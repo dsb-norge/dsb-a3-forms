@@ -1,10 +1,10 @@
 ﻿using System.Net;
-using DsbA3Forms.Clients;
+using DsbNorge.A3Forms.Clients;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace DsbA3Forms.Tests
+namespace DsbNorge.A3Forms.Tests
 {
     [TestFixture]
     public class GeoNorgeClientTests : IDisposable

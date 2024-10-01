@@ -1,4 +1,4 @@
-namespace DsbA3Forms.Models.Address;
+namespace DsbNorge.A3Forms.Models.Address;
 public class Municipality
 {
     public string KommunenavnNorsk { get; set; }

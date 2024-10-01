@@ -17,7 +17,6 @@
     <RepositoryUrl>
       https://github.com/dsb-norge/dsb-a3-forms
     </RepositoryUrl>
-    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Altinn.App.Api" Version="8.3.5">
@@ -26,5 +25,6 @@
     <PackageReference Include="Altinn.App.Core" Version="8.3.5" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.8.0" />
+    <PackageReference Include="MinVer" Version="6.0.0" />
   </ItemGroup>
 </Project>

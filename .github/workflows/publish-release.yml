@@ -7,7 +7,7 @@ on:
 
 jobs:
   release-nuget:
-    if: startsWith(github.ref, 'refs/tags/A3Forms-')
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
         run: |
           cd src/DsbNorge.A3Forms
           dotnet pack DsbNorge.A3Forms.csproj --configuration Release --no-restore --no-build -p:BuildNumber=${{ github.run_number }} -p:Deterministic=true              
-      - name: Publish in NuGet Gallery
+      - name: Publish to NuGet Gallery
         run: |
           cd src/DsbNorge.A3Forms
           dotnet nuget push bin/Release/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}                 

@@ -6,11 +6,11 @@ using JsonSerializer = System.Text.Json.JsonSerializer;
 namespace DsbNorge.A3Forms.Clients;
 public class BringClient : IBringClient
 {
-    HttpClient _client;
-    ILogger<IBringClient> _logger;
-    JsonSerializerOptions _serializerOptions;
-    private readonly IMemoryCache _memoryCache;
+    private readonly JsonSerializerOptions _serializerOptions;
     private readonly MemoryCacheEntryOptions _cacheOptions;
+    private readonly ILogger<IBringClient> _logger;
+    private readonly IMemoryCache _memoryCache;
+    private readonly HttpClient _client;
 
 
     public BringClient(HttpClient client, ILogger<IBringClient> logger, IMemoryCache memoryCache)
@@ -63,7 +63,7 @@ public class BringClient : IBringClient
     }
 }
 
-class CityResponse
+internal class CityResponse
 {
     public string Result { get; set; }
     public bool Valid { get; set; }

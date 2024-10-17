@@ -37,6 +37,24 @@ public partial class InputValidatorClient : IInputValidatorClient
             return false;
         }
     }
+    
+    public bool ValidatePostalCode(string inputValue)
+    {
+        if (string.IsNullOrEmpty(inputValue))
+            return true;
+        if (!RegexPostalCode().IsMatch(inputValue))
+            return false;
+        return true;
+    }
+    
+    public bool ValidateOrgNumber(string inputValue)
+    {
+        if (string.IsNullOrEmpty(inputValue))
+            return true;
+        if (!RegexOrgNumber().IsMatch(inputValue))
+            return false;
+        return true;
+    }
 
     public bool ValidateVictimAge(int? inputValue)
     {
@@ -47,8 +65,25 @@ public partial class InputValidatorClient : IInputValidatorClient
 
         return true;
     }
+    
+    public bool ValidateSsn(string inputValue)
+    {
+        if (inputValue.Length != 11)
+        {
+            return false;
+        }
+
+        return true;
+    }
 
 
     [GeneratedRegex(@"^(\+[0-9]*)?\s?[0-9]{8,}$", RegexOptions.IgnoreCase, "nb-NO")]
     private static partial Regex PhoneNumberRegex();
+    
+    [GeneratedRegex(@"^[0-9]{4}$", RegexOptions.IgnoreCase, "nb-NO")]
+    private static partial Regex RegexPostalCode();
+    
+    
+    [GeneratedRegex(@"[0-9]{9}", RegexOptions.IgnoreCase, "nb-NO")]
+    private static partial Regex RegexOrgNumber();
 }

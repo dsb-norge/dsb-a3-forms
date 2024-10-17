@@ -9,13 +9,17 @@ namespace DsbNorge.A3Forms.Clients;
 
 public class GeoNorgeClient : IGeoNorgeClient
 {
-    private readonly HttpClient _client;
-    private readonly ILogger<IGeoNorgeClient> _logger;
     private readonly JsonSerializerOptions _serializerOptions;
-    private readonly IMemoryCache _memoryCache;
     private readonly MemoryCacheEntryOptions _cacheOptions;
+    private readonly ILogger<IGeoNorgeClient> _logger;
+    private readonly IMemoryCache _memoryCache;
+    private readonly HttpClient _client;
 
-    public GeoNorgeClient(HttpClient client, ILogger<IGeoNorgeClient> logger, IMemoryCache memoryCache)
+    public GeoNorgeClient(
+        HttpClient client,
+        ILogger<IGeoNorgeClient> logger,
+        IMemoryCache memoryCache
+        )
     {
         _logger = logger;
         _client = client;

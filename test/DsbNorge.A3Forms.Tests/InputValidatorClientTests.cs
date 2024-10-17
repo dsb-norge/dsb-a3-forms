@@ -1,10 +1,10 @@
 using DsbNorge.A3Forms.Clients;
 
 namespace DsbNorge.A3Forms.Tests;
-public class InputValidatorTests
+
+public class InputValidatorClientTests
 {
     private InputValidatorClient _inputValidatorClient { get; set; } = null!;
-
 
     [SetUp]
     public void Setup()

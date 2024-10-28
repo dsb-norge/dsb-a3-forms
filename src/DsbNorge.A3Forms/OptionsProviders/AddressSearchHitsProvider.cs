@@ -1,30 +1,31 @@
 using System.Text.Json;
-using Altinn.App.Core.Features;
 using Altinn.App.Core.Models;
-using DsbNorge.A3Forms.Clients;
+using DsbNorge.A3Forms.Clients.GeoNorge;
+using DsbNorge.A3Forms.Models;
 
-namespace DsbNorge.A3Forms.OptionProviders;
-
-public class AddressSearchHitsProvider(IGeoNorgeClient iGeoNorgeClient) : IInstanceDataListProvider
+namespace DsbNorge.A3Forms.OptionsProviders;
+public class AddressSearchHitsProvider
 {
-    public string Id { get; set; } = "addressSearchHits";
-
-    public async Task<DataList> GetInstanceDataListAsync(InstanceIdentifier instanceIdentifier, string language, Dictionary<string, string> keyValuePairs)
+    private readonly IGeoNorgeClient _geoNorgeClient;
+    
+    public AddressSearchHitsProvider(IGeoNorgeClient geoNorgeClient)
     {
-        var items = new List<ListItem>();
+        _geoNorgeClient = geoNorgeClient;
+    }
 
-        if (keyValuePairs.TryGetValue("search", out var addressSearch) && addressSearch.Length >= 3)
+    public async Task<DataList> GetAddresses(string addressSearch, int hitsPerPage)
+    {
+        var items = new List<AddressSearchHit>();
+        
+        var searchHits = await _geoNorgeClient.GetAddresses(addressSearch, hitsPerPage);
+        items.AddRange(searchHits.Select(address => new AddressSearchHit
         {
-            var searchHits = await iGeoNorgeClient.GetAddresses(addressSearch, 5);
-            items.AddRange(searchHits.Select(address => new ListItem
-            {
-                Address = address.Adressetekst,
-                PostalCode = address.Postnummer,
-                PostalCity = address.Poststed,
-                SearchHit = JsonSerializer.Serialize(address)
-            }));
-        }
-
+            Address = address.Adressetekst,
+            PostalCode = address.Postnummer,
+            PostalCity = address.Poststed,
+            SearchHit = JsonSerializer.Serialize(address)
+        }));
+        
         var appListsMetaData = new DataListMetadata { TotaltItemsCount = items.Count };
 
         var objectList = new List<object>();
@@ -32,13 +33,4 @@ public class AddressSearchHitsProvider(IGeoNorgeClient iGeoNorgeClient) : IInsta
 
         return new DataList { ListItems = objectList, _metaData = appListsMetaData };
     }
-
-    private class ListItem
-    {
-        public string Address { get; set; }
-        public string PostalCode { get; set; }
-        public string PostalCity { get; set; }
-        public string SearchHit { get; set; }
-    }
-
 }

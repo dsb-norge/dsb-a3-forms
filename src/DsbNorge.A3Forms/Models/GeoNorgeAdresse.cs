@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace DsbNorge.A3Forms.Models.Address;
+namespace DsbNorge.A3Forms.Models;
 
 public class GeoNorgeAdresseRespons
 {

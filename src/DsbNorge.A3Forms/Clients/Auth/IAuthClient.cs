@@ -1,6 +1,6 @@
 ﻿namespace DsbNorge.A3Forms.Clients.Auth;
 
-public abstract class IAuthClient
+public interface IAuthClient
 {
-    public Task<string> GetToken(string clientIdConfig, string clientSecretConfig, string clientAuthUrlConfig);
+    Task<string> GetToken(string formIdConfig, string clientSecretConfig, string clientAuthUrlConfig);
 }

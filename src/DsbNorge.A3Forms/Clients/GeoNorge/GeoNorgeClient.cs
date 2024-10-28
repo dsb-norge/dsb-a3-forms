@@ -1,11 +1,11 @@
 using System.Text.Json;
 using Altinn.App.Core.Extensions;
-using DsbNorge.A3Forms.Models.Address;
+using DsbNorge.A3Forms.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
-namespace DsbNorge.A3Forms.Clients;
+namespace DsbNorge.A3Forms.Clients.GeoNorge;
 
 public class GeoNorgeClient : IGeoNorgeClient
 {
@@ -25,7 +25,6 @@ public class GeoNorgeClient : IGeoNorgeClient
         _client = client;
         _client.BaseAddress = new Uri("https://ws.geonorge.no/");
         _memoryCache = memoryCache;
-
         _serializerOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true

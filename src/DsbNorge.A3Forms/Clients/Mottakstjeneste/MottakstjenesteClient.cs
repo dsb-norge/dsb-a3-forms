@@ -20,12 +20,10 @@ public class MottakstjenesteClient : IMottakstjenesteClient
         ILogger<IMottakstjenesteClient> logger,
         IConfiguration configuration,
         IMemoryCache memoryCache
-        )
+    )
     {
         _logger = logger;
         _client = client;
-        _client.BaseAddress = new Uri(configuration["https://testprod.dsb.no"]);
-
         _serializerOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true

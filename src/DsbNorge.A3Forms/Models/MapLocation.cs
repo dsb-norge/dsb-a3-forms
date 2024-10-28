@@ -1,4 +1,5 @@
-namespace DsbNorge.A3Forms.Models.Address;
+namespace DsbNorge.A3Forms.Models;
+
 public class MapLocation
 {
     public string LatLonAsString { get; set; }

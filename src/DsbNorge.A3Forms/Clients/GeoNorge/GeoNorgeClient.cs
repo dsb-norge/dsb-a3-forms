@@ -40,7 +40,7 @@ public class GeoNorgeClient : IGeoNorgeClient
     {
         if (searchString.IsNullOrEmpty())
         {
-            return new List<GeoNorgeAdresse>();
+            return [];
         }
 
         var searchWithWildcards = Wildcardify(searchString);
@@ -51,37 +51,36 @@ public class GeoNorgeClient : IGeoNorgeClient
         {
             _logger.LogError("Retrieving addresses for search string '{searchString}' failed with status code {statusCode}",
                 searchString, res.StatusCode);
-            return new List<GeoNorgeAdresse>();
+            return [];
         }
 
         try
         {
             var resString = await res.Content.ReadAsStringAsync();
             var response = JsonSerializer.Deserialize<GeoNorgeAdresseRespons>(resString, _serializerOptions);
-            return response?.Adresser ?? new List<GeoNorgeAdresse>();
+            return response?.Adresser ?? [];
         }
         catch (Exception e)
         {
             _logger.LogError("Exception thrown when retrieving addresses for search string '{searchString}': {message}", searchString, e.Message);
-            return new List<GeoNorgeAdresse>();
+            return [];
         }
     }
 
     public async Task<List<Municipality>> GetMunicipalities()
     {
-        string uniqueCacheKey = "municipalities";
+        const string uniqueCacheKey = "municipalities";
         if (_memoryCache.TryGetValue(uniqueCacheKey, out List<Municipality> cachedMunicipalities))
         {
             return cachedMunicipalities;
         }
 
-        var query = "kommuneinfo/v1/kommuner";
-        var res = await _client.GetAsync(query);
+        var res = await _client.GetAsync("kommuneinfo/v1/kommuner");
 
         if (!res.IsSuccessStatusCode)
         {
             _logger.LogError("Retrieving municipalities failed with status code {statusCode}", res.StatusCode);
-            return new List<Municipality>();
+            return [];
         }
 
         try
@@ -94,12 +93,12 @@ public class GeoNorgeClient : IGeoNorgeClient
                 _memoryCache.Set(uniqueCacheKey, municipalityResponse, _cacheOptions);
             }
 
-            return municipalityResponse ?? new List<Municipality>();
+            return municipalityResponse ?? [];
         }
         catch (Exception e)
         {
             _logger.LogError("Exception thrown when retrieving municipalities: {message}", e.Message);
-            return new List<Municipality>();
+            return [];
         }
     }
 

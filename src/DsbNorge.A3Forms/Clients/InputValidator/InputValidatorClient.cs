@@ -25,28 +25,12 @@ public partial class InputValidatorClient : IInputValidatorClient
 
     public bool ValidateEmailAddress(string inputValue)
     {
-        if (string.IsNullOrEmpty(inputValue))
-            return true;
-        try
-        {
-            new MailAddress(inputValue);
-            return true;
-        }
-        catch (FormatException)
-        {
-            return false;
-        }
+        return string.IsNullOrEmpty(inputValue) || MailAddress.TryCreate(inputValue, out _);
     }
     
     public bool ValidatePostalCode(string inputValue)
     {
-        if (string.IsNullOrEmpty(inputValue))
-            return true;
-        
-        if (!RegexPostalCode().IsMatch(inputValue))
-            return false;
-        
-        return true;
+        return string.IsNullOrEmpty(inputValue) || RegexPostalCode().IsMatch(inputValue);
     }
     
     public bool ValidateOrgNumber(string inputValue)
@@ -63,14 +47,9 @@ public partial class InputValidatorClient : IInputValidatorClient
         return true;
     }
 
-    public bool ValidateVictimAge(int? inputValue)
+    public static bool ValidateVictimAge(int? inputValue)
     {
-        if (inputValue is > 120 or < 0)
-        {
-            return false;
-        }
-
-        return true;
+        return inputValue is not (> 120 or < 0);
     }
     
     public bool ValidateSsn(string inputValue)

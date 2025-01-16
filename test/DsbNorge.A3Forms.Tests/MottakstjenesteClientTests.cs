@@ -41,7 +41,6 @@ public class MottakstjenesteClientTests
         var mottakstjenesteClient = new MottakstjenesteClient(
             _httpClient,
             _loggerMock.Object,
-            _configuration,
             _memoryCache
         );
         _nationalitiesProvider = new NationalitiesProvider(mottakstjenesteClient);

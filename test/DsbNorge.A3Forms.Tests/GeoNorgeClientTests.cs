@@ -3,8 +3,7 @@ using System.Text.Json;
 using Altinn.App.Core.Models;
 using DsbNorge.A3Forms.Clients.GeoNorge;
 using DsbNorge.A3Forms.Models;
-using DsbNorge.A3Forms.OptionsProviders;
-using DsbNorge.A3Forms.Services;
+using DsbNorge.A3Forms.Providers;
 using DsbNorge.A3Forms.Tests.resources;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -17,8 +16,7 @@ public class GeoNorgeClientTests
 {
     private Mock<ILogger<IGeoNorgeClient>> _loggerMock;
     private MockHttpMessageHandler _mockHttpMessageHandler;
-    private MunicipalitiesProvider _municipalitiesProvider;
-    private AddressSearchService _addressSearchService;
+    private MunicipalityProvider _municipalityProvider;
     private AddressSearchHitsProvider _addressSearchHitsProvider;
     private IMemoryCache _memoryCache;
     private HttpClient _httpClient;
@@ -39,8 +37,7 @@ public class GeoNorgeClientTests
             _loggerMock.Object,
             _memoryCache
         );
-        _municipalitiesProvider = new MunicipalitiesProvider(geoNorgeClient);
-        _addressSearchService = new AddressSearchService(geoNorgeClient);
+        _municipalityProvider = new MunicipalityProvider(geoNorgeClient);
         _addressSearchHitsProvider = new AddressSearchHitsProvider(geoNorgeClient);
     }
 
@@ -52,7 +49,7 @@ public class GeoNorgeClientTests
             new GeoNorgeAdresse { Adressetekst = "Testveien 2", Postnummer = "5678", Poststed = "Bergen" }
         ]);
 
-        var result = await _addressSearchService.GetAddresses("Testveien", 10);
+        var result = await _addressSearchHitsProvider.GetAddresses("Testveien", 10);
         
         AssertAddressSearchResult(result);
     }
@@ -72,8 +69,15 @@ public class GeoNorgeClientTests
             null, 
             new Dictionary<string, string> { ["search"] = "Testveien" }
         );
-
+        
         AssertAddressSearchResult(result);
+    }
+
+    [Test]
+    public Task AddressSearchHitsProvider_default_id()
+    {
+        Assert.That(_addressSearchHitsProvider.Id, Is.EqualTo("addressSearchHits"));
+        return Task.CompletedTask;
     }
 
     private void SetupMockAddressResponse(List<GeoNorgeAdresse> addressList)
@@ -88,6 +92,19 @@ public class GeoNorgeClientTests
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(jsonResponse)
+        });
+    }
+
+    private static void AssertAddressSearchResult(List<GeoNorgeAdresse> result)
+    {
+        Assert.That(result, Has.Count.EqualTo(2));
+
+        var firstResult = result[0];
+        Assert.Multiple(() =>
+        {
+            Assert.That(firstResult.Adressetekst, Is.EqualTo("Testveien 1"));
+            Assert.That(firstResult.Postnummer, Is.EqualTo("1234"));
+            Assert.That(firstResult.Poststed, Is.EqualTo("Oslo"));
         });
     }
 
@@ -108,10 +125,10 @@ public class GeoNorgeClientTests
     [Test]
     public async Task GetAddresses_should_return_emptyList_when_search_is_empty()
     {
-        var result = await _addressSearchService.GetAddresses("", 5);
+        var result = await _addressSearchHitsProvider.GetAddresses("", 5);
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.ListItems, Is.Empty);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
@@ -124,14 +141,58 @@ public class GeoNorgeClientTests
             StatusCode = HttpStatusCode.BadRequest
         });
 
-        var result = await _addressSearchService.GetAddresses(searchString, 5);
+        var result = await _addressSearchHitsProvider.GetAddresses(searchString, 5);
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result.ListItems, Is.Empty);
+        Assert.That(result, Is.Empty);
     }
 
     [Test]
     public async Task GetMunicipalities_should_return_municipalities()
+    {
+        SetupMockMunicipalitiesResponse();
+
+        var list = await _municipalityProvider.GetMunicipalities(); 
+        var sortedList = list.OrderBy(m => m.Kommunenummer).ToList();
+        
+        Assert.That(sortedList, Is.Not.Null);
+        Assert.That(sortedList, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(sortedList[0].KommunenavnNorsk, Is.EqualTo("Oslo"));
+            Assert.That(sortedList[0].Kommunenummer, Is.EqualTo("1234"));
+            Assert.That(sortedList[1].KommunenavnNorsk, Is.EqualTo("Bergen"));
+            Assert.That(sortedList[1].Kommunenummer, Is.EqualTo("5678"));
+        });
+    }
+
+    [Test]
+    public async Task GetMunicipalityOptions_should_return_municipalityOptions()
+    {
+        SetupMockMunicipalitiesResponse();
+        
+        var result = await _municipalityProvider.GetAppOptionsAsync(null, new Dictionary<string, string>());
+        
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Options, Is.Not.Null);
+        Assert.That(result.Options, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Options[0].Label, Is.EqualTo("Bergen - 5678"));
+            Assert.That(result.Options[0].Value, Is.EqualTo("5678"));
+            Assert.That(result.Options[1].Label, Is.EqualTo("Oslo - 1234"));
+            Assert.That(result.Options[1].Value, Is.EqualTo("1234"));
+        });
+    }
+
+    [Test]
+    public Task MunicipalityProvider_default_id()
+    {
+        Assert.That(_municipalityProvider.Id, Is.EqualTo("municipalities"));
+        return Task.CompletedTask;
+    }
+
+    private void SetupMockMunicipalitiesResponse()
     {
         var mockMunicipalitiesResponse = new[]
         {
@@ -145,19 +206,6 @@ public class GeoNorgeClientTests
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(responseContent)
-        });
-        
-        var result = await _municipalitiesProvider.GetMunicipalitiesOptions();
-        
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result.Options, Is.Not.Null);
-        Assert.That(result.Options, Has.Count.EqualTo(2));
-        Assert.Multiple(() =>
-        {
-            Assert.That(result.Options[0].Label, Is.EqualTo("Bergen - 5678"));
-            Assert.That(result.Options[0].Value, Is.EqualTo("5678"));
-            Assert.That(result.Options[1].Label, Is.EqualTo("Oslo - 1234"));
-            Assert.That(result.Options[1].Value, Is.EqualTo("1234"));
         });
     }
 

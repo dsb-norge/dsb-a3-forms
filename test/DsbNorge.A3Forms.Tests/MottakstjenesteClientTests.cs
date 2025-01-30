@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using DsbNorge.A3Forms.Clients.Mottakstjeneste;
 using DsbNorge.A3Forms.Models;
-using DsbNorge.A3Forms.OptionsProviders;
+using DsbNorge.A3Forms.Providers;
 using DsbNorge.A3Forms.Tests.resources;
 using Moq;
 
@@ -47,7 +47,40 @@ public class MottakstjenesteClientTests
     }
 
     [Test]
+    public Task NationalitiesProvider_default_id()
+    {
+        Assert.That(_nationalitiesProvider.Id, Is.EqualTo("nationalities"));
+        return Task.CompletedTask;
+    }
+
+    [Test]
     public async Task GetNationalities_should_return_nationalities_in_elulykke_form()
+    {
+        SetupMockNationalitiesResponse();
+
+        var result = await _nationalitiesProvider.GetNationalities("melding-om-elulykke");
+        
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Has.Count.EqualTo(4));
+    }
+
+    [Test]
+    public async Task GetNationalities_should_return_nationality_options_in_elulykke_form()
+    {
+        SetupMockNationalitiesResponse();
+
+        var result = await _nationalitiesProvider.GetAppOptionsAsync(
+            null,
+            new Dictionary<string, string> { ["formName"] = "melding-om-elulykke" }
+            );
+        
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Options, Has.Count.EqualTo(4));
+    }
+
+    private void SetupMockNationalitiesResponse()
     {
         var mockNationalitiesResponse = new[]
         {
@@ -64,13 +97,6 @@ public class MottakstjenesteClientTests
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(responseContent)
         });
-        
-        const string formName = "melding-om-elulykke";
-        var result = await _nationalitiesProvider.GetNationalitiesOptions(formName);
-        
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result.Options, Is.Not.Null);
-        Assert.That(result.Options, Has.Count.EqualTo(4));
     }
 
     [TearDown]

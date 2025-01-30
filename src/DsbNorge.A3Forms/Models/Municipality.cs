@@ -5,8 +5,8 @@ namespace DsbNorge.A3Forms.Models;
 public class Municipality
 {
     [JsonPropertyName("kommunenavnNorsk")] 
-    public string KommunenavnNorsk { get; set; }
+    public required string KommunenavnNorsk { get; set; }
     
     [JsonPropertyName("kommunenummer")] 
-    public string Kommunenummer { get; set; }  
+    public required string Kommunenummer { get; set; }  
 }

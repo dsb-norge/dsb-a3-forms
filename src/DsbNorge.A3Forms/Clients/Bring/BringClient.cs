@@ -35,10 +35,10 @@ namespace DsbNorge.A3Forms.Clients.Bring
             };
         }
 
-        public async Task<string> GetCity(string postalCode)
+        public async Task<string?> GetCity(string postalCode)
         {
             var uniqueCacheKey = $"city-{postalCode}";
-            if (_memoryCache.TryGetValue(uniqueCacheKey, out string city))
+            if (_memoryCache.TryGetValue(uniqueCacheKey, out string? city))
             {
                 return city;
             }
@@ -49,7 +49,7 @@ namespace DsbNorge.A3Forms.Clients.Bring
 
             if (!res.IsSuccessStatusCode)
             {
-                _logger.LogError("Retrieving city for postal code: {postalCode} failed with status code {statusCode}",
+                _logger.LogError("Retrieving city for postal code {postalCode} failed with status code {statusCode}",
                     postalCode,
                     res.StatusCode);
                 return null;
@@ -58,6 +58,11 @@ namespace DsbNorge.A3Forms.Clients.Bring
             var resString = await res.Content.ReadAsStringAsync();
 
             var cityResponse = JsonSerializer.Deserialize<BringCityResponse>(resString, _serializerOptions);
+            if (cityResponse == null)
+            {
+                _logger.LogError("Failed to deserialize city response for postal code {postalCode}", postalCode);
+                return null;
+            }
             var cityName = cityResponse.Valid ? cityResponse.Result : "";
 
             _memoryCache.Set(uniqueCacheKey, cityName, _cacheOptions);

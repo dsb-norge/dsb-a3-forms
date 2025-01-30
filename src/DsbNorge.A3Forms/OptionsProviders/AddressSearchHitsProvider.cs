@@ -1,36 +1,28 @@
-using System.Text.Json;
+using Altinn.App.Core.Features;
 using Altinn.App.Core.Models;
 using DsbNorge.A3Forms.Clients.GeoNorge;
-using DsbNorge.A3Forms.Models;
+using DsbNorge.A3Forms.Services;
 
 namespace DsbNorge.A3Forms.OptionsProviders;
-public class AddressSearchHitsProvider
+
+public class AddressSearchHitsProvider(IGeoNorgeClient geoNorgeClient, string? id = null) : IInstanceDataListProvider
 {
-    private readonly IGeoNorgeClient _geoNorgeClient;
-    
-    public AddressSearchHitsProvider(IGeoNorgeClient geoNorgeClient)
-    {
-        _geoNorgeClient = geoNorgeClient;
-    }
+    public string Id { get; } = id ?? "addressSearchHits";
 
-    public async Task<DataList> GetAddresses(string addressSearch, int hitsPerPage)
+    private readonly AddressSearchService _addressSearchService = new(geoNorgeClient);
+
+    public async Task<DataList> GetInstanceDataListAsync(InstanceIdentifier instanceIdentifier, string? language, Dictionary<string, string> keyValuePairs)
     {
-        var items = new List<AddressSearchHit>();
-        
-        var searchHits = await _geoNorgeClient.GetAddresses(addressSearch, hitsPerPage);
-        items.AddRange(searchHits.Select(address => new AddressSearchHit
+        if (keyValuePairs.TryGetValue("search", out var addressSearch) && addressSearch.Length >= 3)
         {
-            Address = address.Adressetekst,
-            PostalCode = address.Postnummer,
-            PostalCity = address.Poststed,
-            SearchHit = JsonSerializer.Serialize(address)
-        }));
+            return await _addressSearchService.GetAddresses(addressSearch, 5);
+        }
         
-        var appListsMetaData = new DataListMetadata { TotaltItemsCount = items.Count };
-
-        var objectList = new List<object>();
-        items.ForEach(o => objectList.Add(o));
-
-        return new DataList { ListItems = objectList, _metaData = appListsMetaData };
+        return new DataList
+        {
+            ListItems = [], 
+            _metaData = new DataListMetadata { TotaltItemsCount = 0 }
+        };
     }
+
 }

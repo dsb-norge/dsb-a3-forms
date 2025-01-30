@@ -7,43 +7,43 @@ public class GeoNorgeAdresseRespons
     // {"metadata":{"totaltAntallTreff":0,"asciiKompatibel":true,"side":0,"sokeStreng":"sok=Bue%20T%C3%B8nsberg","viserFra":0,"viserTil":10,"treffPerSide":10},"adresser":[]}
     
     [JsonPropertyName("metadata")]
-    public GeoNorgeMetadata Metadata { get; set; }
+    public GeoNorgeMetadata? Metadata { get; set; }
     
     [JsonPropertyName("adresser")]
-    public List<GeoNorgeAdresse> Adresser { get; set; }
+    public List<GeoNorgeAdresse>? Adresser { get; set; }
 }
 
 public class GeoNorgeMetadata
 {
     [JsonPropertyName("totaltAntallTreff")]
-    public int TotaltAntallTreff { get; set; }
+    public int? TotaltAntallTreff { get; set; }
 
     [JsonPropertyName("asciiKompatibel")]
-    public bool AsciiKompatibel { get; set; }
+    public bool? AsciiKompatibel { get; set; }
 
     [JsonPropertyName("side")]
-    public int Side { get; set; }
+    public int? Side { get; set; }
 
     [JsonPropertyName("sokeStreng")]
-    public string SokeStreng { get; set; }
+    public string? SokeStreng { get; set; }
 
     [JsonPropertyName("viserFra")]
-    public int ViserFra { get; set; }
+    public int? ViserFra { get; set; }
 
     [JsonPropertyName("viserTil")]
-    public int ViserTil { get; set; }
+    public int? ViserTil { get; set; }
 
     [JsonPropertyName("treffPerSide")]
-    public int TreffPerSide { get; set; }
+    public int? TreffPerSide { get; set; }
 }
 
 public class GeoNorgeAdresse
 {
     [JsonPropertyName("adressenavn")] 
-    public string Adressenavn { get; set; }
+    public string? Adressenavn { get; set; }
     
     [JsonPropertyName("adressetekst")] 
-    public string Adressetekst { get; set; }
+    public string? Adressetekst { get; set; }
     
     [JsonPropertyName("adressekode")] 
     public int? Adressekode { get; set; }
@@ -52,13 +52,13 @@ public class GeoNorgeAdresse
     public int? Nummer { get; set; }
     
     [JsonPropertyName("bokstav")] 
-    public string Bokstav { get; set; }
+    public string? Bokstav { get; set; }
     
     [JsonPropertyName("kommunenummer")] 
-    public string Kommunenummer { get; set; }
+    public string? Kommunenummer { get; set; }
     
     [JsonPropertyName("kommunenavn")] 
-    public string Kommunenavn { get; set; }
+    public string? Kommunenavn { get; set; }
     
     [JsonPropertyName("gardsnummer")] 
     public int? Gardsnummer { get; set; }
@@ -70,26 +70,26 @@ public class GeoNorgeAdresse
     public int? Festenummer { get; set; }
     
     [JsonPropertyName("poststed")] 
-    public string Poststed { get; set; }
+    public string? Poststed { get; set; }
     
     [JsonPropertyName("postnummer")] 
-    public string Postnummer { get; set; }
+    public string? Postnummer { get; set; }
     
     [JsonPropertyName("representasjonspunkt")] 
-    public Representasjonspunkt Representasjonspunkt { get; set; }
+    public Representasjonspunkt? Representasjonspunkt { get; set; }
     
     [JsonPropertyName("oppdateringsdato")] 
-    public string Oppdateringsdato { get; set; }
+    public string? Oppdateringsdato { get; set; }
 }
 
 public class Representasjonspunkt
 {
     [JsonPropertyName("epsg")] 
-    public string Epsg { get; set; }
+    public string? Epsg { get; set; }
 
     [JsonPropertyName("lat")] 
-    public decimal Lat { get; set; }
+    public decimal? Lat { get; set; }
     
     [JsonPropertyName("lon")] 
-    public decimal Lon { get; set; }
+    public decimal? Lon { get; set; }
 }

@@ -71,7 +71,6 @@ public partial class InputValidatorClient : IInputValidatorClient
     [GeneratedRegex(@"^[0-9]{4}$", RegexOptions.IgnoreCase, "nb-NO")]
     private static partial Regex RegexPostalCode();
     
-    
     [GeneratedRegex(@"[0-9]{9}", RegexOptions.IgnoreCase, "nb-NO")]
     private static partial Regex RegexOrgNumber();
 }

@@ -2,7 +2,7 @@
 
 public class BringCityResponse
 {
-    public string Result { get; set; }
+    public string? Result { get; set; }
     public bool Valid { get; set; }
-    public string PostalCodeType { get; set; }
+    public string? PostalCodeType { get; set; }
 }

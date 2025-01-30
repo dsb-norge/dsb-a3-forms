@@ -5,11 +5,11 @@ namespace DsbNorge.A3Forms.Models;
 public class Nationality
 {
     [JsonPropertyName("navn_id")] 
-    public string Name { get; set; }
+    public required string Name { get; set; }
     
     [JsonPropertyName("landkode")] 
-    public string CountryCode { get; set; }
+    public string? CountryCode { get; set; }
     
     [JsonPropertyName("a2_landkode")] 
-    public string A2CountryCode { get; set; }
+    public string? A2CountryCode { get; set; }
 }

@@ -35,7 +35,7 @@ public class MottakstjenesteClientTests
         _memoryCache = new MemoryCache(new MemoryCacheOptions());
         _httpClient = new HttpClient(_mockHttpMessageHandler)
         {
-            BaseAddress = new Uri(_configuration["BaseUrl"])
+            BaseAddress = new Uri(_configuration["BaseUrl"]!)
         };
 
         var mottakstjenesteClient = new MottakstjenesteClient(

@@ -3,7 +3,6 @@ using Altinn.App.Core.Extensions;
 using DsbNorge.A3Forms.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 
 namespace DsbNorge.A3Forms.Clients.GeoNorge;
 
@@ -38,7 +37,7 @@ public class GeoNorgeClient : IGeoNorgeClient
 
     public async Task<List<GeoNorgeAdresse>> GetAddresses(string searchString, int hitsPerPage)
     {
-        if (searchString.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(searchString))
         {
             return [];
         }
@@ -70,9 +69,9 @@ public class GeoNorgeClient : IGeoNorgeClient
     public async Task<List<Municipality>> GetMunicipalities()
     {
         const string uniqueCacheKey = "municipalities";
-        if (_memoryCache.TryGetValue(uniqueCacheKey, out List<Municipality> cachedMunicipalities))
+        if (_memoryCache.TryGetValue(uniqueCacheKey, out List<Municipality>? cachedMunicipalities))
         {
-            return cachedMunicipalities;
+            return cachedMunicipalities ?? [];
         }
 
         var res = await _client.GetAsync("kommuneinfo/v1/kommuner");

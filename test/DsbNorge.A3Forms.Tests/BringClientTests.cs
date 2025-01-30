@@ -60,7 +60,7 @@ public class BringClientTests
         Assert.Multiple(() =>
         {
             Assert.That(result, Is.EqualTo("Oslo"));
-            Assert.That(_memoryCache.TryGetValue($"city-{postalCode}", out string cachedCity), Is.True);
+            Assert.That(_memoryCache.TryGetValue($"city-{postalCode}", out string? cachedCity), Is.True);
             Assert.That(cachedCity, Is.EqualTo("Oslo"));
         });
     }

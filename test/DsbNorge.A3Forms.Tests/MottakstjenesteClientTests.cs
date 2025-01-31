@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using DsbNorge.A3Forms.Clients.Mottakstjeneste;
 using DsbNorge.A3Forms.Models;
-using DsbNorge.A3Forms.Providers;
+using DsbNorge.A3Forms.Services;
 using DsbNorge.A3Forms.Tests.resources;
 using Moq;
 
@@ -19,7 +19,7 @@ public class MottakstjenesteClientTests
     private MemoryCache _memoryCache;
     private HttpClient _httpClient;
     private IConfiguration _configuration;
-    private NationalitiesProvider _nationalitiesProvider;
+    private CountryService _countryService;
 
     [SetUp]
     public void Setup()
@@ -43,14 +43,7 @@ public class MottakstjenesteClientTests
             _loggerMock.Object,
             _memoryCache
         );
-        _nationalitiesProvider = new NationalitiesProvider(mottakstjenesteClient);
-    }
-
-    [Test]
-    public Task NationalitiesProvider_default_id()
-    {
-        Assert.That(_nationalitiesProvider.Id, Is.EqualTo("nationalities"));
-        return Task.CompletedTask;
+        _countryService = new CountryService(mottakstjenesteClient);
     }
 
     [Test]
@@ -58,7 +51,7 @@ public class MottakstjenesteClientTests
     {
         SetupMockNationalitiesResponse();
 
-        var result = await _nationalitiesProvider.GetNationalities("melding-om-elulykke");
+        var result = await _countryService.GetCountries("melding-om-elulykke");
         
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Has.Count.EqualTo(4));
@@ -69,8 +62,7 @@ public class MottakstjenesteClientTests
     {
         SetupMockNationalitiesResponse();
 
-        var result = await _nationalitiesProvider.GetAppOptionsAsync(
-            null,
+        var result = await _countryService.GetAppOptionsAsync(
             new Dictionary<string, string> { ["formName"] = "melding-om-elulykke" }
             );
         
@@ -82,10 +74,10 @@ public class MottakstjenesteClientTests
     {
         var mockNationalitiesResponse = new[]
         {
-            new Nationality { Name = "Andorra", CountryCode = "AND", A2CountryCode = "AD" },
-            new Nationality { Name = "De forente arabiske emirater", CountryCode = "ARE", A2CountryCode = "AE" },
-            new Nationality { Name = "Afghanistan", CountryCode = "AFG", A2CountryCode = "AF" },
-            new Nationality { Name = "Antigua og Barbuda", CountryCode = "ATG", A2CountryCode = "AG" }
+            new Country { Name = "Andorra", CountryCode = "AND", A2CountryCode = "AD" },
+            new Country { Name = "De forente arabiske emirater", CountryCode = "ARE", A2CountryCode = "AE" },
+            new Country { Name = "Afghanistan", CountryCode = "AFG", A2CountryCode = "AF" },
+            new Country { Name = "Antigua og Barbuda", CountryCode = "ATG", A2CountryCode = "AG" }
         };
 
         var responseContent = JsonSerializer.Serialize(mockNationalitiesResponse);

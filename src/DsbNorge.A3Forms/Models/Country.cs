@@ -2,7 +2,7 @@
 
 namespace DsbNorge.A3Forms.Models;
 
-public class Nationality
+public class Country
 {
     [JsonPropertyName("navn_id")] 
     public required string Name { get; set; }

@@ -21,13 +21,13 @@ public class MottakstjenesteClient(
         AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24)
     };
 
-    public async Task<List<Nationality>> GetNationalities(string formName)
+    public async Task<List<Country>> GetCountries(string formName)
     {
-        logger.LogInformation("Retrieving nationalities");
-        const string uniqueCacheKey = "nationalities";
-        if (memoryCache.TryGetValue(uniqueCacheKey, out List<Nationality>? nationalities))
+        logger.LogInformation("Retrieving countries");
+        const string uniqueCacheKey = "countries";
+        if (memoryCache.TryGetValue(uniqueCacheKey, out List<Country>? countries))
         {
-            return nationalities ?? [];
+            return countries ?? [];
         }
 
         try
@@ -36,21 +36,21 @@ public class MottakstjenesteClient(
 
             if (!res.IsSuccessStatusCode)
             {
-                logger.LogError($"Retrieving nationalities failed with status code {res.StatusCode}");
+                logger.LogError($"Retrieving countries failed with status code {res.StatusCode}");
             }
 
             var resString = await res.Content.ReadAsStringAsync();
             
-            nationalities = JsonSerializer.Deserialize<List<Nationality>>(resString, _serializerOptions) ?? [];
-            memoryCache.Set(uniqueCacheKey, nationalities, _cacheOptions);
-            return nationalities;
+            countries = JsonSerializer.Deserialize<List<Country>>(resString, _serializerOptions) ?? [];
+            memoryCache.Set(uniqueCacheKey, countries, _cacheOptions);
+            return countries;
         }
         catch (Exception e)
         {
-            logger.LogError($"Exception thrown when retrieving nationalities: {e.Message}");
+            logger.LogError($"Exception thrown when retrieving countries: {e.Message}");
             return
             [
-                new Nationality
+                new Country
                 {
                     Name = "invalid"
                 }

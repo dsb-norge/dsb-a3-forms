@@ -4,5 +4,5 @@ namespace DsbNorge.A3Forms.Clients.Mottakstjeneste;
 
 public interface IMottakstjenesteClient
 {
-    Task<List<Nationality>> GetNationalities(string formName);
+    Task<List<Country>> GetCountries(string formName);
 }

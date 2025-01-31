@@ -1,24 +1,21 @@
 ﻿using System.Globalization;
-using Altinn.App.Core.Features;
 using Altinn.App.Core.Models;
 using DsbNorge.A3Forms.Clients.Mottakstjeneste;
 using DsbNorge.A3Forms.Models;
 
-namespace DsbNorge.A3Forms.Providers;
+namespace DsbNorge.A3Forms.Services;
 
-public class NationalitiesProvider(IMottakstjenesteClient mottakstjenesteClient, string? id = null) : IAppOptionsProvider
+public class CountryService(IMottakstjenesteClient mottakstjenesteClient)
 {
-    public string Id { get; } = id ?? "nationalities";
-
-    public async Task<List<Nationality>> GetNationalities(string formName)
+    public async Task<List<Country>> GetCountries(string formName)
     {
-        return await mottakstjenesteClient.GetNationalities(formName);
+        return await mottakstjenesteClient.GetCountries(formName);
     }
 
-    public async Task<AppOptions> GetAppOptionsAsync(string? language, Dictionary<string, string> keyValuePairs)
+    public async Task<AppOptions> GetAppOptionsAsync(Dictionary<string, string> keyValuePairs)
     {
         var formName = keyValuePairs["formName"];
-        var countries = await GetNationalities(formName);
+        var countries = await GetCountries(formName);
 
         var options = new AppOptions
         {

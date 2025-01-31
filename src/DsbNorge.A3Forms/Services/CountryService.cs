@@ -12,6 +12,8 @@ public class CountryService(IMottakstjenesteClient mottakstjenesteClient)
         return await mottakstjenesteClient.GetCountries(formName);
     }
 
+    /// Form name is passed as the value of key <c>formName</c> in <c>keyValuePairs</c>.
+    /// This is needed because it is part of the downstream MT endpoint.
     public async Task<AppOptions> GetAppOptionsAsync(Dictionary<string, string> keyValuePairs)
     {
         var formName = keyValuePairs["formName"];

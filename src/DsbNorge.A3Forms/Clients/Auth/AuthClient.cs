@@ -8,15 +8,15 @@ public class AuthClient(
     ILogger<IAuthClient> logger,
     HttpClient client) : IAuthClient
 {
-    public async Task<string> GetToken(string formIdConfig, string clientSecretConfig, string clientAuthUrlConfig)
+    public async Task<string> GetToken(string clientId, string clientSecret, string tokenEndpoint)
     {
         try
         {
             var form = new Dictionary<string, string>
             {
                 { "grant_type", "client_credentials" },
-                { "client_id", formIdConfig },
-                { "client_secret", clientSecretConfig }
+                { "client_id", clientId },
+                { "client_secret", clientSecret }
             };
             
             if (!client.DefaultRequestHeaders.Contains("cache-control"))
@@ -24,7 +24,7 @@ public class AuthClient(
                 client.DefaultRequestHeaders.Add("cache-control", "no-cache");
             }
 
-            var tokenResponse = await client.PostAsync(clientAuthUrlConfig, new FormUrlEncodedContent(form));
+            var tokenResponse = await client.PostAsync(tokenEndpoint, new FormUrlEncodedContent(form));
             var jsonContent = await tokenResponse.Content.ReadAsStringAsync();
             
             var tok = JsonSerializer.Deserialize<Token>(jsonContent);

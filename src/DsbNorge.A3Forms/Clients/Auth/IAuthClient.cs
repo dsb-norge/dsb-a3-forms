@@ -2,5 +2,5 @@
 
 public interface IAuthClient
 {
-    Task<string> GetToken(string formIdConfig, string clientSecretConfig, string clientAuthUrlConfig);
+    Task<string> GetToken(string clientId, string clientSecret, string tokenEndpoint);
 }

@@ -61,7 +61,6 @@ public class MottakstjenesteClientTests
         var result = await _nationalitiesProvider.GetNationalities("melding-om-elulykke");
         
         Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.Not.Null);
         Assert.That(result, Has.Count.EqualTo(4));
     }
 
@@ -75,7 +74,6 @@ public class MottakstjenesteClientTests
             new Dictionary<string, string> { ["formName"] = "melding-om-elulykke" }
             );
         
-        Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.Not.Null);
         Assert.That(result.Options, Has.Count.EqualTo(4));
     }

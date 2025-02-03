@@ -4,7 +4,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using DsbNorge.A3Forms.Models;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace DsbNorge.A3Forms.Clients.Saft;
@@ -27,7 +26,7 @@ public class SaftClient(
                 new AuthenticationHeaderValue("Bearer", accessToken);
 
             var request = new GetPersonRequest(ssn);
-            var requestJson = JsonConvert.SerializeObject(request);
+            var requestJson = JsonSerializer.Serialize(request);
 
             var res = await client.PostAsync(
                 "/api/v1/person", 

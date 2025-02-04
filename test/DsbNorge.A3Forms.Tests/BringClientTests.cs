@@ -76,15 +76,7 @@ public class BringClientTests
         var result = await _bringClient.GetCity(postalCode);
         
         Assert.That(result, Is.EqualTo(cachedCity));
-        _loggerMock.Verify(
-            logger => logger.Log(
-                It.IsAny<LogLevel>(),
-                It.IsAny<EventId>(),
-                It.IsAny<object>(),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<object, Exception, string>>()!), 
-            Times.Never
-        );
+        _loggerMock.VerifyNoLogging();
     }
 
     [Test]
@@ -100,16 +92,8 @@ public class BringClientTests
         var result = await _bringClient.GetCity(postalCode);
         
         Assert.That(result, Is.Null);
-        
-        _loggerMock.Verify(
-            logger => logger.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("failed with status code")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
-            Times.Once
-        );
+       
+        _loggerMock.VerifyErrorLogging("failed with status code");
     }
 
     [TearDown]

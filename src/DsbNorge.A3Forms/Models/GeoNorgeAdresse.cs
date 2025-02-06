@@ -88,8 +88,8 @@ public class Representasjonspunkt
     public string? Epsg { get; set; }
 
     [JsonPropertyName("lat")] 
-    public decimal? Lat { get; set; }
+    public decimal Lat { get; set; }
     
     [JsonPropertyName("lon")] 
-    public decimal? Lon { get; set; }
+    public decimal Lon { get; set; }
 }

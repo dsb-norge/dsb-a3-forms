@@ -7,9 +7,9 @@ namespace DsbNorge.A3Forms.Services;
 
 public class AddressSearchService(IGeoNorgeClient geoNorgeClient)
 {
-    public async Task<List<GeoNorgeAdresse>> GetAddresses(string addressSearch, int hitsPerPage)
+    public async Task<List<GeoNorgeAdresse>> GetAddresses(string addressSearch, int? radius, int hitsPerPage)
     {
-        return await geoNorgeClient.GetAddresses(addressSearch, hitsPerPage);
+        return await geoNorgeClient.GetAddresses(addressSearch, radius, hitsPerPage);
     }
 
     /// Search string is passed as the value of key <c>search</c> in <c>keyValuePairs</c>.
@@ -23,10 +23,11 @@ public class AddressSearchService(IGeoNorgeClient geoNorgeClient)
                 _metaData = new DataListMetadata { TotaltItemsCount = 0 }
             };
         }
-
-        var items = new List<AddressSearchHit>();
         
-        var searchHits = await GetAddresses(addressSearch, 5);
+        int? radius = addressSearch.Any(char.IsLetter) ? null : 100;
+        
+        var items = new List<AddressSearchHit>();
+        var searchHits = await GetAddresses(addressSearch, radius, 5);
         items.AddRange(searchHits.Select(address => new AddressSearchHit
         {
             Address = address.Adressetekst,
@@ -36,7 +37,6 @@ public class AddressSearchService(IGeoNorgeClient geoNorgeClient)
         }));
         
         var appListsMetaData = new DataListMetadata { TotaltItemsCount = items.Count };
-
         var objectList = new List<object>();
         items.ForEach(o => objectList.Add(o));
 

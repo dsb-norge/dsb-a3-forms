@@ -49,7 +49,7 @@ public class GeoNorgeClientTests
             new GeoNorgeAdresse { Adressetekst = "Testveien 2", Postnummer = "5678", Poststed = "Bergen" }
         ]);
 
-        var result = await _addressSearchService.GetAddresses("Testveien", 10);
+        var result = await _addressSearchService.GetAddresses("Testveien", null,10);
         
         AssertAddressSearchResult(result);
     }
@@ -114,7 +114,7 @@ public class GeoNorgeClientTests
     [Test]
     public async Task GetAddresses_should_return_emptyList_when_search_is_empty()
     {
-        var result = await _addressSearchService.GetAddresses("", 5);
+        var result = await _addressSearchService.GetAddresses("", null, 5);
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.Empty);
@@ -130,12 +130,69 @@ public class GeoNorgeClientTests
             StatusCode = HttpStatusCode.BadRequest
         });
 
-        var result = await _addressSearchService.GetAddresses(searchString, 5);
+        var result = await _addressSearchService.GetAddresses(searchString, null, 5);
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.Empty);
     }
+    
+    [Test]
+    public async Task GetAddresses_should_return_address_when_valid_coordinates_search()
+    {
+        const string coordinates = "59.9139,10.7522";
+        const int radius = 500;
+        const int hitsPerPage = 5;
+        
+        SetupMockAddressResponse([
+            new GeoNorgeAdresse { Adressetekst = "Karl Johans gate 1", Postnummer = "0010", Poststed = "Oslo" },
+            new GeoNorgeAdresse { Adressetekst = "Stortingsgata 4", Postnummer = "0010", Poststed = "Oslo" }
+        ]);
+        
+        var result = await _addressSearchService.GetAddresses(coordinates, radius, hitsPerPage);
+        
+        Assert.That(result, Has.Count.EqualTo(2));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result[0].Adressetekst, Is.EqualTo("Karl Johans gate 1"));
+            Assert.That(result[0].Postnummer, Is.EqualTo("0010"));
+            Assert.That(result[0].Poststed, Is.EqualTo("Oslo"));
+        });
+    }
+    
+    [Test]
+    public async Task GetAddresses_should_do_search_by_coordinates()
+    {
+        const string coordinates = "59.9139,10.7522";
+        const int hitsPerPage = 5;
+        const int radius = 500;
+        const string path = "/adresser/v1/punktsok";
+        
+        SetupMockAddressResponse([]); 
+        HttpRequestMessage? capturedRequest = null;
+        _mockHttpMessageHandler.CaptureRequest(req => capturedRequest = req);
+        
+        await _addressSearchService.GetAddresses(coordinates, radius, hitsPerPage);
 
+        Assert.That(capturedRequest?.RequestUri?.AbsolutePath, Does.StartWith(path));
+    }
+    
+    [Test]
+    public async Task GetAddresses_should_do_search_by_address()
+    {
+        const string searchString = "Testveien 1";
+        const int hitsPerPage = 5;
+        int? radius = null;
+        const string path = "/adresser/v1/sok";
+
+        SetupMockAddressResponse([]); 
+        HttpRequestMessage? capturedRequest = null;
+        _mockHttpMessageHandler.CaptureRequest(req => capturedRequest = req); 
+        
+        await _addressSearchService.GetAddresses(searchString, radius, hitsPerPage);
+        
+        Assert.That(capturedRequest?.RequestUri?.AbsolutePath, Does.StartWith(path));
+    }
+    
     [Test]
     public async Task GetMunicipalities_should_return_municipalities()
     {

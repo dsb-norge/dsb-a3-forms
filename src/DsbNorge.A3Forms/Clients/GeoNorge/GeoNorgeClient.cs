@@ -35,21 +35,43 @@ public class GeoNorgeClient : IGeoNorgeClient
         };
     }
 
-    public async Task<List<GeoNorgeAdresse>> GetAddresses(string searchString, int hitsPerPage)
+    public async Task<List<GeoNorgeAdresse>> GetAddresses(string searchString, int? radius, int hitsPerPage)
     {
         if (string.IsNullOrEmpty(searchString))
         {
             return [];
         }
 
-        var searchWithWildcards = Wildcardify(searchString);
-        var query = $"adresser/v1/sok?treffPerSide={hitsPerPage}&sok={searchWithWildcards}";
+        string query;
+        string searchType;
+        
+        if (radius is > 0)
+        {
+            _logger.LogInformation("Searching for addresses by map lat & lon");
+            var coordinates = searchString.Split(',');
+            query = $"adresser/v1/punktsok?lat={coordinates[0]}&lon={coordinates[1]}&radius={radius}&treffPerSide={hitsPerPage}";
+            searchType = "MAP COORDINATES";
+        }
+        
+        else
+        {
+            _logger.LogInformation("Searching for addresses by address input");
+            var searchWithWildcards = Wildcardify(searchString);
+            query = $"adresser/v1/sok?treffPerSide={hitsPerPage}&sok={searchWithWildcards}";
+            searchType = "ADDRESS INPUT";
+        }
+        
+        return await ExecuteAddressQuery(query, searchString, searchType);
+    }
+    
+    private async Task<List<GeoNorgeAdresse>> ExecuteAddressQuery(string query, string searchInput, string searchType)
+    {
         var res = await _client.GetAsync(query);
-
+        
         if (!res.IsSuccessStatusCode)
         {
-            _logger.LogError("Retrieving addresses for search string '{searchString}' failed with status code {statusCode}",
-                searchString, res.StatusCode);
+            _logger.LogError("Retrieving addresses by {searchType}: '{searchInput}' failed with status code {statusCode}",
+                searchType, searchInput, res.StatusCode);
             return [];
         }
 
@@ -61,7 +83,8 @@ public class GeoNorgeClient : IGeoNorgeClient
         }
         catch (Exception e)
         {
-            _logger.LogError("Exception thrown when retrieving addresses for search string '{searchString}': {message}", searchString, e.Message);
+            _logger.LogError("Exception thrown when retrieving addresses by {searchType}: '{searchInput}': {message}", 
+                searchType, searchInput, e.Message);
             return [];
         }
     }

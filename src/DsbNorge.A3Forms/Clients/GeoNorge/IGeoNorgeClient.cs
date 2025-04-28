@@ -4,7 +4,7 @@ namespace DsbNorge.A3Forms.Clients.GeoNorge;
 
 public interface IGeoNorgeClient
 {
-    public Task<List<GeoNorgeAdresse>> GetAddresses(string searchString, int hitsPerPage);
+    public Task<List<GeoNorgeAdresse>> GetAddresses(string searchString, int? radius, int hitsPerPage);
 
     public Task<List<Municipality>> GetMunicipalities();
 }

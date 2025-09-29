@@ -129,19 +129,6 @@ public class GeoNorgeClient : IGeoNorgeClient
     private static void addOtherRegions(List<Municipality> municipalities)
     {
         municipalities.Add(new Municipality { Kommunenummer = "2100", KommunenavnNorsk = "Svalbard" });
-        municipalities.Add(new Municipality { Kommunenummer = "2211", KommunenavnNorsk = "Jan Mayen" });
-        municipalities.Add(new Municipality { Kommunenummer = "2311", KommunenavnNorsk = "Sokkelen syd for 62° N" });
-        municipalities.Add(new Municipality { Kommunenummer = "2321", KommunenavnNorsk = "Sokkelen nord for 62° N" });
-        municipalities.Add(new Municipality { Kommunenummer = "2399", KommunenavnNorsk = "Sokkelen, uspesifisert" });
-        municipalities.Add(new Municipality { Kommunenummer = "2411", KommunenavnNorsk = "Luftrom under og lik 1000 moh." });
-        municipalities.Add(new Municipality { Kommunenummer = "2412", KommunenavnNorsk = "Luftrom over 1000 moh." });
-        municipalities.Add(new Municipality { Kommunenummer = "2499", KommunenavnNorsk = "Luftrom uspesifisert" });
-        municipalities.Add(new Municipality { Kommunenummer = "2511", KommunenavnNorsk = "Norske ambassader i utlandet" });
-        municipalities.Add(new Municipality { Kommunenummer = "2599", KommunenavnNorsk = "Utlandet, uspesifisert" });
-        municipalities.Add(new Municipality { Kommunenummer = "2611", KommunenavnNorsk = "Havområder innenfor sokkelen" });
-        municipalities.Add(new Municipality { Kommunenummer = "2612", KommunenavnNorsk = "Havområder utenfor sokkelen" });
-        municipalities.Add(new Municipality { Kommunenummer = "2699", KommunenavnNorsk = "Havområder, uspesifisert" });
-        municipalities.Add(new Municipality { Kommunenummer = "2799", KommunenavnNorsk = "Bouvetøya, Peter I Øy og Dronning Mauds Land" });
     }
     private static string Wildcardify(string searchString)
     {

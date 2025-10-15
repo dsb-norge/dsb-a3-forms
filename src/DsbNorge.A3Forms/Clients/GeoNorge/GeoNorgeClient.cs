@@ -112,6 +112,7 @@ public class GeoNorgeClient : IGeoNorgeClient
 
             if (municipalityResponse != null)
             {
+                addOtherRegions(municipalityResponse);
                 _memoryCache.Set(uniqueCacheKey, municipalityResponse, _cacheOptions);
             }
 
@@ -124,6 +125,11 @@ public class GeoNorgeClient : IGeoNorgeClient
         }
     }
 
+    // Adding other regions as per https://snl.no/kommunenummer . As per sept/25 we only handle Svalbard in downstream systems.
+    private static void addOtherRegions(List<Municipality> municipalities)
+    {
+        municipalities.Add(new Municipality { Kommunenummer = "2100", KommunenavnNorsk = "Svalbard" });
+    }
     private static string Wildcardify(string searchString)
     {
         if (searchString.DoesNotContain(' '))

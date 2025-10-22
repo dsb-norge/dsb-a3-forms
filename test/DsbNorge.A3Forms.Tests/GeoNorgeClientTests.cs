@@ -18,7 +18,8 @@ public class GeoNorgeClientTests
     private MockHttpMessageHandler _mockHttpMessageHandler;
     private MunicipalityService _municipalityService;
     private AddressSearchService _addressSearchService;
-    private IMemoryCache _memoryCache;
+    private GeoNorgeClient _geoNorgeClient;
+    private MemoryCache _memoryCache;
     private HttpClient _httpClient;
 
     [SetUp]
@@ -29,16 +30,15 @@ public class GeoNorgeClientTests
         _memoryCache = new MemoryCache(new MemoryCacheOptions());
         _httpClient = new HttpClient(_mockHttpMessageHandler)
         {
-            BaseAddress = new Uri("https://mockaddress.com/")
+            BaseAddress = new Uri("https://geonorgemock.no/")
         };
-        
-        var geoNorgeClient = new GeoNorgeClient(
+        _geoNorgeClient = new GeoNorgeClient(
             _httpClient,
             _loggerMock.Object,
             _memoryCache
         );
-        _municipalityService = new MunicipalityService(geoNorgeClient);
-        _addressSearchService = new AddressSearchService(geoNorgeClient);
+        _municipalityService = new MunicipalityService(_geoNorgeClient);
+        _addressSearchService = new AddressSearchService(_geoNorgeClient);
     }
 
     [Test]
@@ -67,6 +67,29 @@ public class GeoNorgeClientTests
         );
         
         AssertAddressSearchResult(result);
+    }
+    
+    [Test]
+    public async Task GetCityAndMunicipality_should_query_correct_endpoint_with_postal_filter()
+    {
+        SetupMockAddressResponse([
+            new GeoNorgeAdresse { Postnummer = "2682", Poststed = "LALM", Kommunenavn = "VÅGÅ", Kommunenummer = "3435" },
+        ]);
+
+        HttpRequestMessage? capturedRequest = null;
+        _mockHttpMessageHandler.CaptureRequest(req => capturedRequest = req);
+
+        const string postalCode = "2682";
+        var result = await _geoNorgeClient.GetCityAndMunicipality(postalCode);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(capturedRequest?.RequestUri?.AbsolutePath, Does.StartWith("/adresser/v1/sok"));
+            Assert.That(capturedRequest?.RequestUri?.Query, Does.Contain("postnummer=2682"));
+        });
+        Assert.That(capturedRequest?.RequestUri?.Query, Does.Contain("fuzzy=false"));
+        Assert.That(capturedRequest?.RequestUri?.Query, Does.Contain("treffPerSide=1"));
     }
 
     private void SetupMockAddressResponse(List<GeoNorgeAdresse> addressList)
@@ -194,21 +217,24 @@ public class GeoNorgeClientTests
     }
     
     [Test]
-    public async Task GetMunicipalities_should_return_municipalities()
+    public async Task GetMunicipalities_should_add_Svalbard_to_API_results()
     {
         SetupMockMunicipalitiesResponse();
 
-        var list = await _municipalityService.GetMunicipalities(); 
+        var list = await _municipalityService.GetMunicipalities();
         var sortedList = list.OrderBy(m => m.Kommunenummer).ToList();
-        
-        Assert.That(sortedList, Is.Not.Null);
-        Assert.That(sortedList, Has.Count.EqualTo(2));
+
+        Assert.That(sortedList, Has.Count.EqualTo(3));
         Assert.Multiple(() =>
         {
-            Assert.That(sortedList[0].KommunenavnNorsk, Is.EqualTo("Oslo"));
             Assert.That(sortedList[0].Kommunenummer, Is.EqualTo("1234"));
-            Assert.That(sortedList[1].KommunenavnNorsk, Is.EqualTo("Bergen"));
-            Assert.That(sortedList[1].Kommunenummer, Is.EqualTo("5678"));
+            Assert.That(sortedList[0].KommunenavnNorsk, Is.EqualTo("Oslo"));
+
+            Assert.That(sortedList[1].Kommunenummer, Is.EqualTo("2100"));
+            Assert.That(sortedList[1].KommunenavnNorsk, Is.EqualTo("Svalbard"));
+
+            Assert.That(sortedList[2].Kommunenummer, Is.EqualTo("5678"));
+            Assert.That(sortedList[2].KommunenavnNorsk, Is.EqualTo("Bergen"));
         });
     }
 
@@ -216,18 +242,20 @@ public class GeoNorgeClientTests
     public async Task GetMunicipalityOptions_should_return_municipalityOptions()
     {
         SetupMockMunicipalitiesResponse();
-        
+
         var result = await _municipalityService.GetAppOptionsAsync();
-        
+
         Assert.That(result, Is.Not.Null);
         Assert.That(result.Options, Is.Not.Null);
-        Assert.That(result.Options, Has.Count.EqualTo(2));
+        Assert.That(result.Options, Has.Count.EqualTo(3));
         Assert.Multiple(() =>
         {
             Assert.That(result.Options[0].Label, Is.EqualTo("Bergen - 5678"));
             Assert.That(result.Options[0].Value, Is.EqualTo("5678"));
             Assert.That(result.Options[1].Label, Is.EqualTo("Oslo - 1234"));
             Assert.That(result.Options[1].Value, Is.EqualTo("1234"));
+            Assert.That(result.Options[2].Label, Is.EqualTo("Svalbard - 2100"));
+            Assert.That(result.Options[2].Value, Is.EqualTo("2100"));
         });
     }
 

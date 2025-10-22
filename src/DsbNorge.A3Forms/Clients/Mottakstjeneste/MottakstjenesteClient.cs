@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using DsbNorge.A3Forms.Models;

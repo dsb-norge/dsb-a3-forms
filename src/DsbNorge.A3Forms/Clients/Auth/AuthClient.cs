@@ -40,11 +40,7 @@ public class AuthClient(
             var jsonContent = await tokenResponse.Content.ReadAsStringAsync();
             
             var tok = JsonSerializer.Deserialize<Token>(jsonContent);
-            if (tok?.AccessToken is null or "")
-            {
-                throw new SystemException("No token returned!");
-            }
-            return tok.AccessToken;
+            return tok?.AccessToken is null or "" ? throw new SystemException("No token returned!") : tok.AccessToken;
         }
         catch (Exception e)
         {

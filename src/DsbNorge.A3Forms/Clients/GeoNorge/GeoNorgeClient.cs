@@ -64,6 +64,38 @@ public class GeoNorgeClient : IGeoNorgeClient
         return await ExecuteAddressQuery(query, searchString, searchType);
     }
     
+    public async Task<GeoNorgeAdresse?> GetCityAndMunicipality(string postalCode)
+    {
+        if (string.IsNullOrEmpty(postalCode))
+        {
+            return null;
+        }
+
+        var uniqueCacheKey = $"city-municipality-{postalCode}";
+        if (_memoryCache.TryGetValue(uniqueCacheKey, out GeoNorgeAdresse? cachedResult))
+        {
+            return cachedResult;
+        }
+
+        const string searchType = "POSTAL CODE";
+        const string filter = "adresser.postnummer%2C" +
+                              "adresser.poststed%2C" +
+                              "adresser.kommunenummer%2C" +
+                              "adresser.kommunenavn";
+
+        var query = $"adresser/v1/sok?fuzzy=false&objtype=Vegadresse&postnummer={postalCode}&filtrer={filter}&utkoordsys=4258&treffPerSide=1&side=0&asciiKompatibel=true";
+
+        var results = await ExecuteAddressQuery(query, postalCode, searchType);
+        var result = results.FirstOrDefault();
+
+        if (result != null)
+        {
+            _memoryCache.Set(uniqueCacheKey, result, _cacheOptions);
+        }
+
+        return result;
+    }
+    
     private async Task<List<GeoNorgeAdresse>> ExecuteAddressQuery(string query, string searchInput, string searchType)
     {
         var res = await _client.GetAsync(query);

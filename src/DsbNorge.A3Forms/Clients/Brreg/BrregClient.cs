@@ -60,7 +60,11 @@ public class BrregClient : IBrregClient
             var data = await response.Content.ReadAsStringAsync();
             var brregOrg = JsonSerializer.Deserialize<BrregOrg>(data, _serializerOptions);
 
-            if (brregOrg == null) return brregOrg;
+            if (brregOrg == null)
+            {
+                _logger.LogWarning("Failed to deserialize organization {orgNumber} - received null from BRREG API", orgNumber);
+                return brregOrg;
+            }
             
             _memoryCache.Set(orgNumber, brregOrg, _cacheOptions);
             _logger.LogInformation($"Successfully retrieved and cached organization {orgNumber}");

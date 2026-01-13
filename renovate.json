@@ -1,0 +1,14 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "local>dsb-norge/.github:renovate-config"
+  ],
+  "enabledManagers": ["npm", "maven", "nuget"],
+  "packageRules": [
+    {
+      "matchManagers": ["nuget"],
+      "groupName": "combined - minor and patch",
+      "matchUpdateTypes": ["minor", "patch"]
+    }
+  ]
+}

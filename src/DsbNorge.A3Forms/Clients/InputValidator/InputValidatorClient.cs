@@ -25,7 +25,11 @@ public partial class InputValidatorClient : IInputValidatorClient
 
     public bool ValidateEmailAddress(string inputValue)
     {
-        return string.IsNullOrEmpty(inputValue) || MailAddress.TryCreate(inputValue, out _);
+        if (string.IsNullOrEmpty(inputValue))
+            return true;
+        
+        // TryCreate() does not check for whitespace, so we need to do that ourselves
+        return !inputValue.Any(char.IsWhiteSpace) && MailAddress.TryCreate(inputValue, out _);
     }
     
     public bool ValidatePostalCode(string inputValue)

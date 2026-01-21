@@ -23,7 +23,7 @@ public class InputValidatorClientTests
     }
 
     [Test]
-    public void PhoneNumber_should_be_invalid()
+    public void PhoneNumber_too_short_should_be_invalid()
     {
         const string inputValue = "9933";
         var result = InputValidatorClient.ValidatePhoneNumber(inputValue);
@@ -41,9 +41,27 @@ public class InputValidatorClientTests
     }
 
     [Test]
-    public void EmailAddress_should_be_invalid()
+    public void EmailAddress_missing_at_should_be_invalid()
     {
         const string inputValue = "testmail.no";
+        var result = InputValidatorClient.ValidateEmailAddress(inputValue);
+
+        Assert.That(result, Is.False);
+    }
+    
+    [Test]
+    public void EmailAddress_with_prefix_whitespace_should_be_invalid()
+    {
+        const string inputValue = " test@mail.no";
+        var result = InputValidatorClient.ValidateEmailAddress(inputValue);
+
+        Assert.That(result, Is.False);
+    }
+    
+    [Test]
+    public void EmailAddress_with_suffix_whitespace_should_be_invalid()
+    {
+        const string inputValue = "test@mail.no ";
         var result = InputValidatorClient.ValidateEmailAddress(inputValue);
 
         Assert.That(result, Is.False);

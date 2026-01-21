@@ -3,7 +3,7 @@
   "extends": [
     "local>dsb-norge/.github:renovate-config"
   ],
-  "enabledManagers": ["npm", "maven", "nuget"],
+  "enabledManagers": ["nuget"],
   "packageRules": [
     {
       "matchManagers": ["nuget"],

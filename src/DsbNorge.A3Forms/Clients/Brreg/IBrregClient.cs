@@ -7,4 +7,5 @@ public interface IBrregClient
     public Task<BrregOrganizationStatus> GetOrganizationStatus(string organizationNumber);
     public Task<BrregOrgForm?> GetOrgForm(string code);
     public Task<BrregOrg?> GetOrg(string orgNumber);
+    public Task<BrregSubEntity?> GetSubEntity(string orgNumber);
 }

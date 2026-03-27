@@ -64,6 +64,48 @@ public class BrregClient(
         }
     }
 
+    public async Task<BrregSubEntity?> GetSubEntity(string orgNumber)
+    {
+        try
+        {
+            if (memoryCache.TryGetValue($"sub-{orgNumber}", out BrregSubEntity? cachedSubEntity))
+            {
+                logger.LogInformation($"Retrieved sub entity {orgNumber} from cache");
+                return cachedSubEntity;
+            }
+
+            var path = $"/enhetsregisteret/api/underenheter/{orgNumber}";
+            logger.LogInformation($"Retrieving sub entity {orgNumber} from BRREG, url: {client.BaseAddress + path}");
+
+            var response = await client.GetAsync(path);
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                logger.LogWarning($"Failed to retrieve sub entity {orgNumber}, status code: {response.StatusCode}");
+                return null;
+            }
+
+            var data = await response.Content.ReadAsStringAsync();
+            var brregSubEntity = JsonSerializer.Deserialize<BrregSubEntity>(data, _serializerOptions);
+
+            if (brregSubEntity == null)
+            {
+                logger.LogWarning("Failed to deserialize sub entity {orgNumber} - received null from BRREG API", orgNumber);
+                return brregSubEntity;
+            }
+
+            memoryCache.Set($"sub-{orgNumber}", brregSubEntity, _cacheOptions);
+            logger.LogInformation($"Successfully retrieved and cached sub entity {orgNumber}");
+
+            return brregSubEntity;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, $"Error retrieving sub entity {orgNumber}: {e.Message}");
+            return null;
+        }
+    }
+
     public async Task<BrregOrgForm?> GetOrgForm(string code)
     {
         try

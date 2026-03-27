@@ -29,6 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="resources\**\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="NUnit.Framework" />
   </ItemGroup>
 

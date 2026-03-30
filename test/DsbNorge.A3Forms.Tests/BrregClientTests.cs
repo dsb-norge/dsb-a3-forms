@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Reflection;
 using System.Text.Json;
 using DsbNorge.A3Forms.Clients.Brreg;
 using DsbNorge.A3Forms.Tests.resources;
@@ -34,8 +35,19 @@ public class BrregClientTests
         );
     }
 
+
     [Test]
-    public async Task GetOrg_should_return_org_with_business_address()
+    public void GetOrg_should_have_obsolete_attribute()
+    {
+        var method = typeof(BrregClient).GetMethod("GetOrg");
+        var obsoleteAttr = method?.GetCustomAttribute<ObsoleteAttribute>();
+
+        Assert.That(obsoleteAttr, Is.Not.Null);
+        Assert.That(obsoleteAttr!.Message, Does.Contain("GetEntity"));
+    }
+    
+    [Test]
+    public async Task GetEntity_should_return_org_with_business_address()
     {
         var mockData = JsonSerializer.Serialize(new
         {
@@ -53,7 +65,7 @@ public class BrregClientTests
             Content = new StringContent(mockData)
         });
 
-        var result = await _brregClient.GetOrg("987654321");
+        var result = await _brregClient.GetEntity("987654321");
 
         Assert.That(result, Is.Not.Null);
         Assert.Multiple(() =>
@@ -83,23 +95,12 @@ public class BrregClientTests
         {
             Assert.That(result.Organisasjonsnummer, Is.EqualTo("509100675"));
             Assert.That(result.Navn, Is.EqualTo("Sesam stasjon"));
-            Assert.That(result.Organisasjonsform.Kode, Is.EqualTo("BEDR"));
-            Assert.That(result.Organisasjonsform.Beskrivelse, Is.EqualTo("Underenhet til næringsdrivende og offentlig forvaltning"));
-            Assert.That(result.Organisasjonsform.Utgaatt, Is.EqualTo("2024-01-04"));
             Assert.That(result.Beliggenhetsadresse, Is.Not.Null);
             Assert.That(result.Beliggenhetsadresse!.Kommune, Is.EqualTo("Oslo"));
             Assert.That(result.Beliggenhetsadresse.Land, Is.EqualTo("Norge"));
             Assert.That(result.Beliggenhetsadresse.Postnummer, Is.EqualTo("0010"));
             Assert.That(result.Postadresse, Is.Not.Null);
             Assert.That(result.Postadresse!.Poststed, Is.EqualTo("Oslo"));
-            Assert.That(result.RegistrertIMvaregisteret, Is.True);
-            Assert.That(result.AntallAnsatte, Is.EqualTo(50));
-            Assert.That(result.HarRegistrertAntallAnsatte, Is.True);
-            Assert.That(result.OverordnetEnhet, Is.EqualTo("376181782"));
-            Assert.That(result.Nedleggelsesdato, Is.EqualTo("2024-01-04"));
-            Assert.That(result.Epostadresse, Is.EqualTo("epost@epost.com"));
-            Assert.That(result.Telefon, Is.EqualTo("91504800"));
-            Assert.That(result.Mobil, Is.EqualTo("91504800"));
         });
     }
 

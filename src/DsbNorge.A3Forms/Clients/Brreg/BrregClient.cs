@@ -22,7 +22,13 @@ public class BrregClient(
         AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24)
     };
 
+    [Obsolete("GetOrg is deprecated. Use GetEntity instead.")]
     public async Task<BrregOrg?> GetOrg(string orgNumber)
+    {
+        return await GetEntity(orgNumber);
+    }
+
+    public async Task<BrregOrg?> GetEntity(string orgNumber)
     {
         try
         {

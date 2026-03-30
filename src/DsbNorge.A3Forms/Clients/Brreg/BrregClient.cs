@@ -23,29 +23,29 @@ public class BrregClient(
     };
 
     [Obsolete("GetOrg is deprecated. Use GetEntity instead.")]
-    public async Task<BrregOrg?> GetOrg(string orgNumber)
+    public async Task<BrregOrg?> GetOrg(string organizationNumber)
     {
-        return await GetEntity(orgNumber);
+        return await GetEntity(organizationNumber);
     }
 
-    public async Task<BrregOrg?> GetEntity(string orgNumber)
+    public async Task<BrregOrg?> GetEntity(string organizationNumber)
     {
         try
         {
-            if (memoryCache.TryGetValue(orgNumber, out BrregOrg? cachedOrg))
+            if (memoryCache.TryGetValue(organizationNumber, out BrregOrg? cachedOrg))
             {
-                logger.LogInformation($"Retrieved organization {orgNumber} from cache");
+                logger.LogInformation("Retrieved organization {OrganizationNumber} from cache", organizationNumber);
                 return cachedOrg;
             }
 
-            var path = $"/enhetsregisteret/api/enheter/{orgNumber}";
-            logger.LogInformation($"Retrieving organization {orgNumber} from BRREG, url: {client.BaseAddress + path}");
+            var path = $"/enhetsregisteret/api/enheter/{organizationNumber}";
+            logger.LogInformation("Retrieving organization {OrganizationNumber} from BRREG, url: {Url}", organizationNumber, client.BaseAddress + path);
 
             var response = await client.GetAsync(path);
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                logger.LogWarning($"Failed to retrieve organization {orgNumber}, status code: {response.StatusCode}");
+                logger.LogWarning("Failed to retrieve organization {OrganizationNumber}, status code: {StatusCode}", organizationNumber, response.StatusCode);
                 return null;
             }
 
@@ -54,40 +54,40 @@ public class BrregClient(
 
             if (brregOrg == null)
             {
-                logger.LogWarning("Failed to deserialize organization {orgNumber} - received null from BRREG API", orgNumber);
+                logger.LogWarning("Failed to deserialize organization {OrganizationNumber} - received null from BRREG API", organizationNumber);
                 return brregOrg;
             }
-            
-            memoryCache.Set(orgNumber, brregOrg, _cacheOptions);
-            logger.LogInformation($"Successfully retrieved and cached organization {orgNumber}");
+
+            memoryCache.Set(organizationNumber, brregOrg, _cacheOptions);
+            logger.LogInformation("Successfully retrieved and cached organization {OrganizationNumber}", organizationNumber);
 
             return brregOrg;
         }
         catch (Exception e)
         {
-            logger.LogError(e, $"Error retrieving organization {orgNumber}: {e.Message}");
+            logger.LogError(e, "Error retrieving organization {OrganizationNumber}: {ErrorMessage}", organizationNumber, e.Message);
             return null;
         }
     }
 
-    public async Task<BrregSubEntity?> GetSubEntity(string orgNumber)
+    public async Task<BrregSubEntity?> GetSubEntity(string organizationNumber)
     {
         try
         {
-            if (memoryCache.TryGetValue($"sub-{orgNumber}", out BrregSubEntity? cachedSubEntity))
+            if (memoryCache.TryGetValue($"sub-{organizationNumber}", out BrregSubEntity? cachedSubEntity))
             {
-                logger.LogInformation($"Retrieved sub entity {orgNumber} from cache");
+                logger.LogInformation("Retrieved sub entity {OrganizationNumber} from cache", organizationNumber);
                 return cachedSubEntity;
             }
 
-            var path = $"/enhetsregisteret/api/underenheter/{orgNumber}";
-            logger.LogInformation($"Retrieving sub entity {orgNumber} from BRREG, url: {client.BaseAddress + path}");
+            var path = $"/enhetsregisteret/api/underenheter/{organizationNumber}";
+            logger.LogInformation("Retrieving sub entity {OrganizationNumber} from BRREG, url: {Url}", organizationNumber, client.BaseAddress + path);
 
             var response = await client.GetAsync(path);
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                logger.LogWarning($"Failed to retrieve sub entity {orgNumber}, status code: {response.StatusCode}");
+                logger.LogWarning("Failed to retrieve sub entity {OrganizationNumber}, status code: {StatusCode}", organizationNumber, response.StatusCode);
                 return null;
             }
 
@@ -96,18 +96,18 @@ public class BrregClient(
 
             if (brregSubEntity == null)
             {
-                logger.LogWarning("Failed to deserialize sub entity {orgNumber} - received null from BRREG API", orgNumber);
+                logger.LogWarning("Failed to deserialize sub entity {OrganizationNumber} - received null from BRREG API", organizationNumber);
                 return brregSubEntity;
             }
 
-            memoryCache.Set($"sub-{orgNumber}", brregSubEntity, _cacheOptions);
-            logger.LogInformation($"Successfully retrieved and cached sub entity {orgNumber}");
+            memoryCache.Set($"sub-{organizationNumber}", brregSubEntity, _cacheOptions);
+            logger.LogInformation("Successfully retrieved and cached sub entity {OrganizationNumber}", organizationNumber);
 
             return brregSubEntity;
         }
         catch (Exception e)
         {
-            logger.LogError(e, $"Error retrieving sub entity {orgNumber}: {e.Message}");
+            logger.LogError(e, "Error retrieving sub entity {OrganizationNumber}: {ErrorMessage}", organizationNumber, e.Message);
             return null;
         }
     }
@@ -117,13 +117,13 @@ public class BrregClient(
         try
         {
             var orgFormPath = $"/enhetsregisteret/api/organisasjonsformer/{code}";
-            logger.LogInformation($"Retrieving organization form {code} from BRREG, url: {client.BaseAddress + orgFormPath}");
+            logger.LogInformation("Retrieving organization form {Code} from BRREG, url: {Url}", code, client.BaseAddress + orgFormPath);
 
             var res = await client.GetAsync(orgFormPath);
 
             if (res.StatusCode != HttpStatusCode.OK)
             {
-                logger.LogWarning($"Failed to retrieve organization form {code}, status code: {res.StatusCode}");
+                logger.LogWarning("Failed to retrieve organization form {Code}, status code: {StatusCode}", code, res.StatusCode);
                 return null;
             }
 
@@ -134,7 +134,7 @@ public class BrregClient(
         }
         catch (Exception e)
         {
-            logger.LogError(e, $"Error retrieving organization form {code}: {e.Message}");
+            logger.LogError(e, "Error retrieving organization form {Code}: {ErrorMessage}", code, e.Message);
             return null;
         }
     }
@@ -145,7 +145,7 @@ public class BrregClient(
         {
             // 1. Lookup sub entity. If active or deleted, we are done.
             var subEntityPath = $"/enhetsregisteret/api/underenheter/{organizationNumber}";
-            logger.LogInformation($"Retrieving sub entity {organizationNumber} from BRREG, url: {client.BaseAddress + subEntityPath}");
+            logger.LogInformation("Retrieving sub entity {OrganizationNumber} from BRREG, url: {Url}", organizationNumber, client.BaseAddress + subEntityPath);
             var res = await client.GetAsync(subEntityPath);
 
             if (res.IsSuccessStatusCode)
@@ -162,12 +162,12 @@ public class BrregClient(
 
             // 2. Lookup entity. If deleted or not found, we are done.
             var entityPath = $"/enhetsregisteret/api/enheter/{organizationNumber}";
-            logger.LogInformation($"Sub entity not found, or lookup failed. Trying entity, url: {client.BaseAddress + entityPath}");
+            logger.LogInformation("Sub entity not found, or lookup failed. Trying entity, url: {Url}", client.BaseAddress + entityPath);
             var result = await client.GetAsync(entityPath);
 
             if (result.StatusCode == HttpStatusCode.NotFound)
             {
-                logger.LogWarning($"Organization {organizationNumber} not found in BRREG. Wonder how user got logged in with this org!");
+                logger.LogWarning("Organization {OrganizationNumber} not found in BRREG. Wonder how user got logged in with this org!", organizationNumber);
                 return BrregOrganizationStatus.NotFound;
             }
             if (result.IsSuccessStatusCode)
@@ -177,24 +177,24 @@ public class BrregClient(
                 var deletionDate = brregResponse != null ? GetDeletionDate(brregResponse) : null;
                 if (deletionDate != null && deletionDate < DateTime.Now)
                 {
-                    logger.LogWarning($"Organization {organizationNumber} has deletion date {deletionDate:yyyy-MM-dd)} in BRREG . Wonder how user got logged in with this org!");
+                    logger.LogWarning("Organization {OrganizationNumber} has deletion date {DeletionDate} in BRREG. Wonder how user got logged in with this org!", organizationNumber, deletionDate?.ToString("yyyy-MM-dd"));
                     return BrregOrganizationStatus.Deleted;
                 }
             }
             else
             {
-                logger.LogError($"Retrieving organization as entity failed with status code {res.StatusCode}");
+                logger.LogError("Retrieving organization as entity failed with status code {StatusCode}", res.StatusCode);
                 return BrregOrganizationStatus.LookupFailed;
             }
 
             // 3. If entity is active, check if it has sub entities.
             var path = $"/enhetsregisteret/api/underenheter/?overordnetEnhet={organizationNumber}&size=500";
-            logger.LogInformation($"Checking if organization {organizationNumber} has sub entities, url: {client.BaseAddress + path}");
+            logger.LogInformation("Checking if organization {OrganizationNumber} has sub entities, url: {Url}", organizationNumber, client.BaseAddress + path);
             var hasSubRes = await client.GetAsync(path);
 
             if (!hasSubRes.IsSuccessStatusCode)
             {
-                logger.LogError($"Failed looking up sub entities for existing entity org {organizationNumber}, status code: {hasSubRes.StatusCode}");
+                logger.LogError("Failed looking up sub entities for existing entity org {OrganizationNumber}, status code: {StatusCode}", organizationNumber, hasSubRes.StatusCode);
                 return BrregOrganizationStatus.LookupFailed;
             }
             var sub = await hasSubRes.Content.ReadAsStringAsync();
@@ -204,7 +204,7 @@ public class BrregClient(
         }
         catch (Exception e)
         {
-            logger.LogError(e, $"Retrieving organization {organizationNumber} failed: : {e.Message}");
+            logger.LogError(e, "Retrieving organization {OrganizationNumber} failed: {ErrorMessage}", organizationNumber, e.Message);
             return BrregOrganizationStatus.LookupFailed;
         }
     }

@@ -1,0 +1,81 @@
+{
+  "respons_klasse": "Underenhet",
+  "organisasjonsnummer": "509100675",
+  "navn": "Sesam stasjon",
+  "organisasjonsform": {
+    "_links": {
+      "self": {
+        "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/BEDR"
+      }
+    },
+    "kode": "BEDR",
+    "utgaatt": "2024-01-04",
+    "beskrivelse": "Underenhet til næringsdrivende og offentlig forvaltning"
+  },
+  "postadresse": {
+    "kommune": "Oslo",
+    "landkode": "NO",
+    "postnummer": "0010",
+    "adresse": [
+      "Oslo"
+    ],
+    "land": "Norge",
+    "kommunenummer": "0301",
+    "poststed": "Oslo"
+  },
+  "beliggenhetsadresse": {
+    "kommune": "Oslo",
+    "landkode": "NO",
+    "postnummer": "0010",
+    "adresse": [
+      "Oslo"
+    ],
+    "land": "Norge",
+    "kommunenummer": "0301",
+    "poststed": "Oslo"
+  },
+  "registrertIMvaregisteret": true,
+  "naeringskode1": {
+    "kode": "41.109",
+    "beskrivelse": "Utvikling og salg av egen fast eiendom ellers"
+  },
+  "naeringskode2": {
+    "kode": "41.109",
+    "beskrivelse": "Utvikling og salg av egen fast eiendom ellers"
+  },
+  "naeringskode3": {
+    "kode": "41.109",
+    "beskrivelse": "Utvikling og salg av egen fast eiendom ellers"
+  },
+  "hjelpeenhetskode": {
+    "kode": "70.100",
+    "beskrivelse": "Hovedkontortjenester"
+  },
+  "registreringsdatoEnhetsregisteret": "2024-01-04",
+  "hjemmeside": "www.brreg.no",
+  "frivilligMvaRegistrertBeskrivelser": [
+    "Utleier av bygg eller anlegg"
+  ],
+  "antallAnsatte": 50,
+  "harRegistrertAntallAnsatte": true,
+  "overordnetEnhet": "376181782",
+  "oppstartsdato": "2024-01-04",
+  "datoEierskifte": "2024-01-04",
+  "nedleggelsesdato": "2024-01-04",
+  "registreringsdatoAntallAnsatteNAVAaregisteret": "2024-01-04",
+  "registreringsdatoAntallAnsatteEnhetsregisteret": "2024-01-04",
+  "registreringsdatoMerverdiavgiftsregisteret": "2024-01-04",
+  "registreringsdatoMerverdiavgiftsregisteretEnhetsregisteret": "2024-01-04",
+  "registreringsdatoFrivilligMerverdiavgiftsregisteret": "2024-01-04",
+  "epostadresse": "epost@epost.com",
+  "telefon": "91504800",
+  "mobil": "91504800",
+  "_links": {
+    "overordnetEnhet": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/enheter/376181782"
+    },
+    "self": {
+      "href": "https://data.brreg.no/enhetsregisteret/api/underenheter/509100675"
+    }
+  }
+}

@@ -10,6 +10,9 @@ public class BrregSubEntity
   [JsonPropertyName("navn")]
   public string Navn { get; set; } = string.Empty;
 
+  [JsonPropertyName("overordnetEnhet")]
+  public string? OverordnetEnhet { get; set; }
+
   [JsonPropertyName("organisasjonsform")]
   public BrregOrgForm Organisasjonsform { get; set; } = new();
 

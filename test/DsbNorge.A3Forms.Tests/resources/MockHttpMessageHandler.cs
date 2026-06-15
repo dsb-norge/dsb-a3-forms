@@ -17,8 +17,11 @@ public class MockHttpMessageHandler : HttpMessageHandler, IDisposable
     {
         _requestCaptureCallback?.Invoke(request);
         
-        var responseToSend = _httpResponseMessage ?? new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("[]") }; 
-                
+        var responseToSend =
+            _responder?.Invoke(request)
+            ?? _httpResponseMessage
+            ?? new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("[]") };
+        
         return Task.FromResult(responseToSend);
     }
 
@@ -32,4 +35,9 @@ public class MockHttpMessageHandler : HttpMessageHandler, IDisposable
     {
         _requestCaptureCallback = callback;
     }
+    
+    private Func<HttpRequestMessage, HttpResponseMessage>? _responder;
+
+    public void SetResponder(Func<HttpRequestMessage, HttpResponseMessage> responder)
+        => _responder = responder;
 }

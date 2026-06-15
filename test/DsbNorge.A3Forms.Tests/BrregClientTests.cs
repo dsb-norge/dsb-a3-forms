@@ -169,6 +169,65 @@ public class BrregClientTests
 
         Assert.That(status, Is.EqualTo(BrregOrganizationStatus.SubEntity));
     }
+    
+    [Test]
+      public async Task GetLegalOrgForm_returns_form_directly_for_hovedenhet()
+      {
+          _mockHttpMessageHandler.SetResponder(req =>
+          {
+              // /underenheter/{org} -> 404 (actor is a main entity)
+              if (req.RequestUri!.AbsolutePath.Contains("/underenheter/"))
+                  return new HttpResponseMessage(HttpStatusCode.NotFound);
+
+              // /enheter/{org} -> entity with organisasjonsform
+              var json = JsonSerializer.Serialize(new
+              {
+                  organisasjonsnummer = "987654321",
+                  navn = "Ola Nordmann",
+                  organisasjonsform = new { kode = "ENK", beskrivelse = "Enkeltpersonforetak" }
+              });
+              return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(json) };
+          });
+
+          var result = await _brregClient.GetLegalOrgForm("987654321");
+
+          Assert.That(result, Is.Not.Null);
+          Assert.That(result!.Code, Is.EqualTo("ENK"));
+      }
+
+      [Test]
+      public async Task GetLegalOrgForm_resolves_hovedenhet_when_actor_is_underenhet()
+      {
+          _mockHttpMessageHandler.SetResponder(req =>
+          {
+              if (req.RequestUri!.AbsolutePath.Contains("/underenheter/"))
+              {
+                  // sub entity: own form is BEDR, but it points at its parent
+                  var sub = JsonSerializer.Serialize(new
+                  {
+                      organisasjonsnummer = "111111111",
+                      navn = "Underenhet",
+                      organisasjonsform = new { kode = "BEDR", beskrivelse = "Bedrift" },
+                      overordnetEnhet = "987654321"
+                  });
+                  return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(sub) };
+              }
+
+              // ain entity carries the legal form
+              var entity = JsonSerializer.Serialize(new
+              {
+                  organisasjonsnummer = "987654321",
+                  navn = "Ola Nordmann",
+                  organisasjonsform = new { kode = "ENK", beskrivelse = "Enkeltpersonforetak" }
+              });
+              return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(entity) };
+          });
+  
+          var result = await _brregClient.GetLegalOrgForm("111111111");
+
+          Assert.That(result, Is.Not.Null);
+          Assert.That(result!.Code, Is.EqualTo("ENK"));
+      }
 
     [TearDown]
     public void TearDown()

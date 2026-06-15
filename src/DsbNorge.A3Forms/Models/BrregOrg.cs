@@ -9,6 +9,9 @@ public class BrregOrg
 
   [JsonPropertyName("navn")]
   public string Navn { get; set; } = string.Empty;
+  
+  [JsonPropertyName("organisasjonsform")]
+  public BrregOrgForm? Organisasjonsform { get; set; }
 
   [JsonPropertyName("forretningsadresse")]
   public ForretningsAdresse? ForretningsAdresse { get; set; }

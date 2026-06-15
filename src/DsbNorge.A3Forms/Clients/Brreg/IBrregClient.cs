@@ -11,4 +11,11 @@ public interface IBrregClient
 
     public Task<BrregOrg?> GetEntity(string organizationNumber);
     public Task<BrregSubEntity?> GetSubEntity(string organizationNumber);
+    
+    /// <summary>
+    /// Returns the legal organisasjonsform (ENK, AS, NUF, ...) of the actor.
+    /// Underenheter always have form BEDR/AAFY, so when the org is an underenhet
+    /// this resolves and returns the form of its hovedenhet (overordnetEnhet).
+    /// </summary>
+    public Task<BrregOrgForm?> GetLegalOrgForm(string organizationNumber);
 }

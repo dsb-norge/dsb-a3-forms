@@ -232,7 +232,20 @@ public class BrregClient(
     {
         [JsonPropertyName("underenheter")] public List<BrregOrganization>? SubEntities { get; } = subEntities;
     }
+    
+    public async Task<BrregOrgForm?> GetLegalOrgForm(string organizationNumber)
+    {
+        // Sub entitites always have organisasjonsform BEDR/AAFY;
+        // the legal form (ENK/AS/NUF/...) lives on the main entity.
+        // Resolve from the parent when needed.
+        var subEntity = await GetSubEntity(organizationNumber);
+        var mainEntityNumber = string.IsNullOrWhiteSpace(subEntity?.OverordnetEnhet)
+            ? organizationNumber
+            : subEntity.OverordnetEnhet;
 
+        var entity = await GetEntity(mainEntityNumber);
+        return entity?.Organisasjonsform;
+    }
 }
 
 public enum BrregOrganizationStatus

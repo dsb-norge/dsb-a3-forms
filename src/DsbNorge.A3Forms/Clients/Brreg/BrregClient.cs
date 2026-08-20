@@ -112,6 +112,52 @@ public class BrregClient(
         }
     }
 
+    public async Task<List<BrregSubEntity>?> GetSubEntities(string organizationNumber)
+    {
+        try
+        {
+            var cacheKey = $"subentities-{organizationNumber}";
+            if (memoryCache.TryGetValue(cacheKey, out List<BrregSubEntity>? cachedSubEntities) && cachedSubEntities != null)
+            {
+                logger.LogInformation("Retrieved sub entities of {OrganizationNumber} from cache", organizationNumber);
+                return cachedSubEntities;
+            }
+
+            var path = $"/enhetsregisteret/api/underenheter?overordnetEnhet={organizationNumber}&size=500&sort=navn,DESC";
+            logger.LogInformation("Retrieving sub entities of {OrganizationNumber} from BRREG, url: {Url}", organizationNumber, client.BaseAddress + path);
+
+            var response = await client.GetAsync(path);
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                logger.LogWarning("Failed to retrieve sub entities of {OrganizationNumber}, status code: {StatusCode}", organizationNumber, response.StatusCode);
+                return null;
+            }
+
+            var data = await response.Content.ReadAsStringAsync();
+            var brregResponse = JsonSerializer.Deserialize<BrregSubResponse>(data, _serializerOptions);
+
+            if (brregResponse == null)
+            {
+                logger.LogWarning("Failed to deserialize sub entities of {OrganizationNumber} - received null from BRREG API", organizationNumber);
+                return null;
+            }
+
+            // BRREG omits _embedded entirely when the entity has no sub entities.
+            var subEntities = brregResponse.Embedded?.SubEntities ?? [];
+
+            memoryCache.Set(cacheKey, subEntities, _cacheOptions);
+            logger.LogInformation("Successfully retrieved and cached {Count} sub entities of {OrganizationNumber}", subEntities.Count, organizationNumber);
+
+            return subEntities;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error retrieving sub entities of {OrganizationNumber}: {ErrorMessage}", organizationNumber, e.Message);
+            return null;
+        }
+    }
+
     public async Task<BrregOrgForm?> GetOrgForm(string code)
     {
         try
@@ -188,19 +234,15 @@ public class BrregClient(
             }
 
             // 3. If entity is active, check if it has sub entities.
-            var path = $"/enhetsregisteret/api/underenheter/?overordnetEnhet={organizationNumber}&size=500";
-            logger.LogInformation("Checking if organization {OrganizationNumber} has sub entities, url: {Url}", organizationNumber, client.BaseAddress + path);
-            var hasSubRes = await client.GetAsync(path);
+            var subEntities = await GetSubEntities(organizationNumber);
 
-            if (!hasSubRes.IsSuccessStatusCode)
+            if (subEntities == null)
             {
-                logger.LogError("Failed looking up sub entities for existing entity org {OrganizationNumber}, status code: {StatusCode}", organizationNumber, hasSubRes.StatusCode);
+                logger.LogError("Failed looking up sub entities for existing entity org {OrganizationNumber}", organizationNumber);
                 return BrregOrganizationStatus.LookupFailed;
             }
-            var sub = await hasSubRes.Content.ReadAsStringAsync();
 
-            var subResponse = JsonSerializer.Deserialize<BrregSubResponse>(sub, _serializerOptions);
-            return subResponse?.Embedded?.SubEntities?.Count > 0 ? BrregOrganizationStatus.EntityWithSubEntities : BrregOrganizationStatus.EntityWithoutSubEntities;
+            return subEntities.Count > 0 ? BrregOrganizationStatus.EntityWithSubEntities : BrregOrganizationStatus.EntityWithoutSubEntities;
         }
         catch (Exception e)
         {
@@ -228,9 +270,9 @@ public class BrregClient(
         [JsonPropertyName("_embedded")] public EmbeddedSubEntities? Embedded { get; init; }
     }
 
-    private class EmbeddedSubEntities(List<BrregOrganization>? subEntities)
+    private class EmbeddedSubEntities(List<BrregSubEntity>? subEntities)
     {
-        [JsonPropertyName("underenheter")] public List<BrregOrganization>? SubEntities { get; } = subEntities;
+        [JsonPropertyName("underenheter")] public List<BrregSubEntity>? SubEntities { get; } = subEntities;
     }
     
     public async Task<BrregOrgForm?> GetLegalOrgForm(string organizationNumber)

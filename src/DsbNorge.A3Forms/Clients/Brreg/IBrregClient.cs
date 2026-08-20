@@ -11,6 +11,12 @@ public interface IBrregClient
 
     public Task<BrregOrg?> GetEntity(string organizationNumber);
     public Task<BrregSubEntity?> GetSubEntity(string organizationNumber);
+
+    /// <summary>
+    /// Returns the sub entities (underenheter) of the given main entity.
+    /// Returns an empty list when the entity has no sub entities, and null when the lookup fails.
+    /// </summary>
+    public Task<List<BrregSubEntity>?> GetSubEntities(string organizationNumber);
     
     /// <summary>
     /// Returns the legal organisasjonsform (ENK, AS, NUF, ...) of the actor.

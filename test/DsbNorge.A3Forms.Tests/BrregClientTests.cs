@@ -257,24 +257,24 @@ public class BrregClientTests
     }
     
     [Test]
-      public async Task GetOrganizationStatus_should_return_EntityWithSubEntities_when_sub_entities_exist()
-      {
-          _mockHttpMessageHandler.SetResponder(BuildEntityWithSubEntitiesResponder(subEntityCount: 1));
+    public async Task GetOrganizationStatus_should_return_EntityWithSubEntities_when_sub_entities_exist()
+    {
+        _mockHttpMessageHandler.SetResponder(BuildEntityWithSubEntitiesResponder(subEntityCount: 1));
 
-          var status = await _brregClient.GetOrganizationStatus("312954672");
+        var status = await _brregClient.GetOrganizationStatus("312954672");
 
-          Assert.That(status, Is.EqualTo(BrregOrganizationStatus.EntityWithSubEntities));
-      }
+        Assert.That(status, Is.EqualTo(BrregOrganizationStatus.EntityWithSubEntities));
+    }
 
     [Test]
-      public async Task GetOrganizationStatus_should_return_EntityWithoutSubEntities_when_sub_entity_list_is_empty()
-      {
-          _mockHttpMessageHandler.SetResponder(BuildEntityWithSubEntitiesResponder(subEntityCount: 0));
+    public async Task GetOrganizationStatus_should_return_EntityWithoutSubEntities_when_sub_entity_list_is_empty()
+    {
+        _mockHttpMessageHandler.SetResponder(BuildEntityWithSubEntitiesResponder(subEntityCount: 0));
 
-          var status = await _brregClient.GetOrganizationStatus("312954672");
+        var status = await _brregClient.GetOrganizationStatus("312954672");
 
-          Assert.That(status, Is.EqualTo(BrregOrganizationStatus.EntityWithoutSubEntities));
-      }
+        Assert.That(status, Is.EqualTo(BrregOrganizationStatus.EntityWithoutSubEntities));
+    }
 
     private static Func<HttpRequestMessage, HttpResponseMessage> BuildEntityWithSubEntitiesResponder(int subEntityCount)
     {

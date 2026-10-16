@@ -50,20 +50,23 @@ public class BrregClient(
             return organization;
         }
 
-        // 2. Not a sub entity, or sub entity lookup failed. Lookup entity.
-        logger.LogInformation("Sub entity {OrganizationNumber} not found, or lookup failed. Trying entity", organizationNumber);
+        if (subStatus == LookupStatus.LookupFailed)
+        {
+            return new BrregOrganization { Organisasjonsnummer = organizationNumber, LookupStatus = LookupStatus.LookupFailed };
+        }
+
+        // 2. Not a sub entity. Lookup entity.
+        logger.LogInformation("Sub entity {OrganizationNumber} not found. Trying entity", organizationNumber);
         var (entityStatus, entity) = await Fetch<EntityResponse>(
             $"/enhetsregisteret/api/enheter/{organizationNumber}", organizationNumber, "organization", organizationNumber);
 
         if (entityStatus != LookupStatus.Ok)
         {
-            // When the sub entity lookup failed we cannot tell whether the organization exists.
-            var status = subStatus == LookupStatus.LookupFailed ? LookupStatus.LookupFailed : entityStatus;
-            if (status == LookupStatus.OrganizationNotFound)
+            if (entityStatus == LookupStatus.OrganizationNotFound)
             {
                 logger.LogWarning("Organization {OrganizationNumber} not found in BRREG", organizationNumber);
             }
-            return new BrregOrganization { Organisasjonsnummer = organizationNumber, LookupStatus = status };
+            return new BrregOrganization { Organisasjonsnummer = organizationNumber, LookupStatus = entityStatus };
         }
 
         var mainEntity = new BrregOrganization

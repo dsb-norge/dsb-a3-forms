@@ -275,29 +275,32 @@ public class BrregClientTests
     }
 
     [Test]
-    public async Task GetOrganization_should_return_LookupFailed_when_sub_entity_lookup_fails_and_entity_is_not_found()
+    public async Task GetOrganization_should_return_LookupFailed_without_further_lookups_when_sub_entity_lookup_fails()
     {
-        _mockHttpMessageHandler.SetResponder(req => req.RequestUri!.AbsolutePath.Contains("/underenheter/")
-            ? new HttpResponseMessage(HttpStatusCode.InternalServerError)
-            : new HttpResponseMessage(HttpStatusCode.NotFound));
-
-        var result = await _brregClient.GetOrganization("123456789");
-
-        Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.LookupFailed));
-    }
-
-    [Test]
-    public async Task GetOrganization_should_return_main_entity_when_sub_entity_lookup_fails()
-    {
+        var requestedUris = new List<Uri>();
+        _mockHttpMessageHandler.CaptureRequest(req => requestedUris.Add(req.RequestUri!));
         _mockHttpMessageHandler.SetResponder(BuildEntityWithSubEntitiesResponder(subEntityCount: 0, subEntityStatus: HttpStatusCode.InternalServerError));
 
         var result = await _brregClient.GetOrganization("312954672");
 
         Assert.Multiple(() =>
         {
-            Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.Ok));
-            Assert.That(result.Type, Is.EqualTo(EntityType.Main));
+            Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.LookupFailed));
+            Assert.That(result.Type, Is.Null);
+            Assert.That(requestedUris.Select(u => u.AbsolutePath), Is.EqualTo(new[] { "/enhetsregisteret/api/underenheter/312954672" }));
         });
+    }
+
+    [Test]
+    public async Task GetOrganization_should_return_LookupFailed_when_sub_entity_is_not_found_and_entity_lookup_fails()
+    {
+        _mockHttpMessageHandler.SetResponder(req => req.RequestUri!.AbsolutePath.Contains("/underenheter/")
+            ? new HttpResponseMessage(HttpStatusCode.NotFound)
+            : new HttpResponseMessage(HttpStatusCode.InternalServerError));
+
+        var result = await _brregClient.GetOrganization("123456789");
+
+        Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.LookupFailed));
     }
 
     [Test]

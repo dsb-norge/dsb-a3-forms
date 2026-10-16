@@ -1,7 +1,7 @@
 ﻿using System.Net;
-using System.Reflection;
 using System.Text.Json;
 using DsbNorge.A3Forms.Clients.Brreg;
+using DsbNorge.A3Forms.Models;
 using DsbNorge.A3Forms.Tests.resources;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -34,67 +34,208 @@ public class BrregClientTests
             _memoryCache
         );
     }
-
-
-    [Test]
-    public void GetOrg_should_have_obsolete_attribute()
-    {
-        var method = typeof(BrregClient).GetMethod("GetOrg");
-        var obsoleteAttr = method?.GetCustomAttribute<ObsoleteAttribute>();
-
-        Assert.That(obsoleteAttr, Is.Not.Null);
-        Assert.That(obsoleteAttr!.Message, Does.Contain("GetEntity"));
-    }
     
     [Test]
-    public async Task GetEntity_should_return_org_with_business_address()
+    public async Task GetOrganization_should_return_main_entity_with_business_address_and_sub_entities()
     {
-        var mockData = JsonSerializer.Serialize(new
+        _mockHttpMessageHandler.SetResponder(req =>
         {
-            organisasjonsnummer = "987654321",
-            navn = "Test Bedrift AS",
-            forretningsadresse = new
+            // sub entity list lookup: /underenheter?overordnetEnhet=...
+            if (!string.IsNullOrEmpty(req.RequestUri!.Query))
             {
-                postnummer = "0123",
-                poststed = "Oslo"
+                var list = JsonSerializer.Serialize(new
+                {
+                    _embedded = new
+                    {
+                        underenheter = new[]
+                        {
+                            new
+                            {
+                                organisasjonsnummer = "315829186",
+                                navn = "ALFABETISK SIGEN TIGER AS",
+                                organisasjonsform = new
+                                {
+                                    kode = "BEDR",
+                                    beskrivelse = "Underenhet til næringsdrivende og offentlig forvaltning"
+                                },
+                                overordnetEnhet = "987654321",
+                                beliggenhetsadresse = new { postnummer = "0010", poststed = "Oslo" }
+                            }
+                        }
+                    }
+                });
+                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(list) };
             }
-        });
-        _mockHttpMessageHandler.SetHttpResponse(new HttpResponseMessage
-        {
-            StatusCode = HttpStatusCode.OK,
-            Content = new StringContent(mockData)
+
+            // the org itself is not a sub entity
+            if (req.RequestUri.AbsolutePath.Contains("/underenheter/"))
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+
+            var entity = JsonSerializer.Serialize(new
+            {
+                organisasjonsnummer = "987654321",
+                navn = "Test Bedrift AS",
+                organisasjonsform = new { kode = "AS", beskrivelse = "Aksjeselskap" },
+                forretningsadresse = new
+                {
+                    postnummer = "0123",
+                    poststed = "Oslo",
+                    adresse = new[] { "Testveien 1" }
+                }
+            });
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(entity) };
         });
 
-        var result = await _brregClient.GetEntity("987654321");
+        var result = await _brregClient.GetOrganization("987654321");
 
-        Assert.That(result, Is.Not.Null);
         Assert.Multiple(() =>
         {
+            Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.Ok));
             Assert.That(result.Organisasjonsnummer, Is.EqualTo("987654321"));
             Assert.That(result.Navn, Is.EqualTo("Test Bedrift AS"));
+            Assert.That(result.Type, Is.EqualTo(EntityType.Main));
+            Assert.That(result.OverordnetEnhet, Is.Null);
+            Assert.That(result.Organisasjonsform?.Code, Is.EqualTo("AS"));
             Assert.That(result.ForretningsAdresse, Is.Not.Null);
             Assert.That(result.ForretningsAdresse!.Postnummer, Is.EqualTo("0123"));
             Assert.That(result.ForretningsAdresse.Poststed, Is.EqualTo("Oslo"));
+            Assert.That(result.ForretningsAdresse.AdresseLinjer, Is.EqualTo(new[] { "Testveien 1" }));
+            Assert.That(result.Underenheter, Has.Count.EqualTo(1));
+        });
+
+        var sub = result.Underenheter![0];
+        Assert.Multiple(() =>
+        {
+            Assert.That(sub.Organisasjonsnummer, Is.EqualTo("315829186"));
+            Assert.That(sub.Navn, Is.EqualTo("ALFABETISK SIGEN TIGER AS"));
+            Assert.That(sub.Type, Is.EqualTo(EntityType.Sub));
+            Assert.That(sub.Organisasjonsform?.Code, Is.EqualTo("BEDR"));
+            Assert.That(sub.OverordnetEnhet, Is.EqualTo("987654321"));
+            Assert.That(sub.OverordnetOrganisasjonsform?.Code, Is.EqualTo("AS"));
+            Assert.That(sub.Beliggenhetsadresse?.Postnummer, Is.EqualTo("0010"));
         });
     }
 
     [Test]
-    public async Task GetSubEntity_should_correctly_parse_full_brreg_json_response()
+    public async Task GetOrganization_should_return_empty_sub_entity_list_when_main_entity_has_none()
     {
-        var mockData = await File.ReadAllTextAsync("resources/MockSubEntity.json");
-        _mockHttpMessageHandler.SetHttpResponse(new HttpResponseMessage
+        _mockHttpMessageHandler.SetResponder(req =>
         {
-            StatusCode = HttpStatusCode.OK,
-            Content = new StringContent(mockData)
+            // BRREG omits _embedded entirely when there are no hits
+            if (!string.IsNullOrEmpty(req.RequestUri!.Query))
+                return new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent("""{"page":{"size":20,"totalElements":0,"totalPages":0,"number":0}}""")
+                };
+
+            if (req.RequestUri.AbsolutePath.Contains("/underenheter/"))
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+
+            var entity = JsonSerializer.Serialize(new { organisasjonsnummer = "312954672", navn = "Hovedenhet AS" });
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(entity) };
         });
 
-        var result = await _brregClient.GetSubEntity("509100675");
+        var result = await _brregClient.GetOrganization("312954672");
 
-        Assert.That(result, Is.Not.Null);
+        Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.Ok));
+        Assert.That(result.Underenheter, Is.Not.Null);
+        Assert.That(result.Underenheter, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetOrganization_should_return_Ok_with_empty_sub_entity_list_when_sub_entity_list_is_not_found()
+    {
+        _mockHttpMessageHandler.SetResponder(req =>
+        {
+            if (req.RequestUri!.AbsolutePath.Contains("/underenheter"))
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+
+            var entity = JsonSerializer.Serialize(new { organisasjonsnummer = "312954672", navn = "Hovedenhet AS" });
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(entity) };
+        });
+
+        var result = await _brregClient.GetOrganization("312954672");
+
         Assert.Multiple(() =>
         {
+            Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.Ok));
+            Assert.That(result.Underenheter, Is.Not.Null);
+            Assert.That(result.Underenheter, Is.Empty);
+        });
+    }
+
+    [Test]
+    public async Task GetOrganization_should_request_correct_sub_entity_list_url()
+    {
+        var requestedUris = new List<Uri>();
+        _mockHttpMessageHandler.CaptureRequest(req => requestedUris.Add(req.RequestUri!));
+        _mockHttpMessageHandler.SetResponder(req =>
+            req.RequestUri!.AbsolutePath.Contains("/underenheter/")
+                ? new HttpResponseMessage(HttpStatusCode.NotFound)
+                : new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("""{"organisasjonsnummer":"312954672","navn":"Hovedenhet AS"}""") });
+
+        await _brregClient.GetOrganization("312954672");
+
+        Assert.That(requestedUris.Select(u => u.PathAndQuery), Does.Contain(
+            "/enhetsregisteret/api/underenheter?overordnetEnhet=312954672&size=500&sort=navn,DESC"));
+    }
+
+    [Test]
+    public async Task GetOrganization_should_return_LookupFailed_when_sub_entity_list_lookup_fails()
+    {
+        _mockHttpMessageHandler.SetResponder(req =>
+        {
+            if (!string.IsNullOrEmpty(req.RequestUri!.Query))
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+
+            if (req.RequestUri.AbsolutePath.Contains("/underenheter/"))
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+
+            var entity = JsonSerializer.Serialize(new { organisasjonsnummer = "312954672", navn = "Hovedenhet AS" });
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(entity) };
+        });
+
+        var result = await _brregClient.GetOrganization("312954672");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.LookupFailed));
+            Assert.That(result.Navn, Is.EqualTo("Hovedenhet AS"));
+            Assert.That(result.Underenheter, Is.Null);
+        });
+    }
+
+    [Test]
+    public async Task GetOrganization_should_correctly_parse_full_brreg_sub_entity_json_response()
+    {
+        var mockSubEntity = await File.ReadAllTextAsync("resources/MockSubEntity.json");
+        _mockHttpMessageHandler.SetResponder(req =>
+        {
+            if (req.RequestUri!.AbsolutePath.Contains("/underenheter/"))
+                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(mockSubEntity) };
+
+            var parent = JsonSerializer.Serialize(new
+            {
+                organisasjonsnummer = "376181782",
+                navn = "Sesam AS",
+                organisasjonsform = new { kode = "AS", beskrivelse = "Aksjeselskap" }
+            });
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(parent) };
+        });
+
+        var result = await _brregClient.GetOrganization("509100675");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.Ok));
             Assert.That(result.Organisasjonsnummer, Is.EqualTo("509100675"));
             Assert.That(result.Navn, Is.EqualTo("Sesam stasjon"));
+            Assert.That(result.Type, Is.EqualTo(EntityType.Sub));
+            Assert.That(result.OverordnetEnhet, Is.EqualTo("376181782"));
+            Assert.That(result.Organisasjonsform?.Code, Is.EqualTo("BEDR"));
+            Assert.That(result.OverordnetOrganisasjonsform?.Code, Is.EqualTo("AS"));
+            Assert.That(result.ForretningsAdresse, Is.Null);
+            Assert.That(result.Underenheter, Is.Null);
             Assert.That(result.Beliggenhetsadresse, Is.Not.Null);
             Assert.That(result.Beliggenhetsadresse!.Kommune, Is.EqualTo("Oslo"));
             Assert.That(result.Beliggenhetsadresse.Land, Is.EqualTo("Norge"));
@@ -105,117 +246,91 @@ public class BrregClientTests
     }
 
     [Test]
-    public async Task GetSubEntities_should_return_sub_entities_with_org_form()
+    public async Task GetOrganization_should_return_OrganizationNotFound_when_not_found()
     {
-        var mockData = JsonSerializer.Serialize(new
-        {
-            _embedded = new
-            {
-                underenheter = new[]
-                {
-                    new
-                    {
-                        organisasjonsnummer = "315829186",
-                        navn = "ALFABETISK SIGEN TIGER AS",
-                        organisasjonsform = new
-                        {
-                            kode = "BEDR",
-                            beskrivelse = "Underenhet til næringsdrivende og offentlig forvaltning"
-                        },
-                        overordnetEnhet = "312954672"
-                    }
-                }
-            }
-        });
-        _mockHttpMessageHandler.SetHttpResponse(new HttpResponseMessage
-        {
-            StatusCode = HttpStatusCode.OK,
-            Content = new StringContent(mockData)
-        });
+        _mockHttpMessageHandler.SetHttpResponse(new HttpResponseMessage(HttpStatusCode.NotFound));
 
-        var result = await _brregClient.GetSubEntities("312954672");
+        var result = await _brregClient.GetOrganization("123456789");
 
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Has.Count.EqualTo(1));
         Assert.Multiple(() =>
         {
-            Assert.That(result![0].Organisasjonsnummer, Is.EqualTo("315829186"));
-            Assert.That(result[0].Navn, Is.EqualTo("ALFABETISK SIGEN TIGER AS"));
-            Assert.That(result[0].Organisasjonsform.Code, Is.EqualTo("BEDR"));
-            Assert.That(result[0].OverordnetEnhet, Is.EqualTo("312954672"));
+            Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.OrganizationNotFound));
+            Assert.That(result.Organisasjonsnummer, Is.EqualTo("123456789"));
+            Assert.That(result.Type, Is.Null);
         });
     }
 
     [Test]
-    public async Task GetSubEntities_should_request_correct_url()
-    {
-        Uri? requestedUri = null;
-        _mockHttpMessageHandler.CaptureRequest(req => requestedUri = req.RequestUri);
-        _mockHttpMessageHandler.SetHttpResponse(new HttpResponseMessage
-        {
-            StatusCode = HttpStatusCode.OK,
-            Content = new StringContent("{}")
-        });
-
-        await _brregClient.GetSubEntities("312954672");
-
-        Assert.That(requestedUri, Is.Not.Null);
-        Assert.That(requestedUri!.PathAndQuery, Is.EqualTo(
-            "/enhetsregisteret/api/underenheter?overordnetEnhet=312954672&size=500&sort=navn,DESC"));
-    }
-
-    [Test]
-    public async Task GetSubEntities_should_return_empty_list_when_entity_has_no_sub_entities()
-    {
-        // BRREG omits _embedded entirely when there are no hits
-        _mockHttpMessageHandler.SetHttpResponse(new HttpResponseMessage
-        {
-            StatusCode = HttpStatusCode.OK,
-            Content = new StringContent("""{"page":{"size":20,"totalElements":0,"totalPages":0,"number":0}}""")
-        });
-
-        var result = await _brregClient.GetSubEntities("312954672");
-
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.Empty);
-    }
-
-    [Test]
-    public async Task GetSubEntities_should_return_null_when_lookup_fails()
+    public async Task GetOrganization_should_return_LookupFailed_when_sub_entity_and_entity_lookups_fail()
     {
         _mockHttpMessageHandler.SetHttpResponse(new HttpResponseMessage(HttpStatusCode.InternalServerError));
 
-        var result = await _brregClient.GetSubEntities("312954672");
+        var result = await _brregClient.GetOrganization("123456789");
 
-        Assert.That(result, Is.Null);
-    }
-
-    [Test]
-    public async Task GetOrgForm_should_return_org_form_description()
-    {
-        var mockData = JsonSerializer.Serialize(new
-        {
-            kode = "AS",
-            beskrivelse = "Aksjeselskap"
-        });
-        _mockHttpMessageHandler.SetHttpResponse(new HttpResponseMessage
-        {
-            StatusCode = HttpStatusCode.OK,
-            Content = new StringContent(mockData)
-        });
-
-        var result = await _brregClient.GetOrgForm("AS");
-
-        Assert.That(result, Is.Not.Null);
         Assert.Multiple(() =>
         {
-            Assert.That(result.Code, Is.EqualTo("AS"));
-            Assert.That(result.Description, Is.EqualTo("Aksjeselskap"));
+            Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.LookupFailed));
+            Assert.That(result.Organisasjonsnummer, Is.EqualTo("123456789"));
         });
     }
 
     [Test]
-    public async Task GetOrganizationStatus_should_return_Deleted_when_deletion_date_is_in_past()
+    public async Task GetOrganization_should_return_LookupFailed_when_sub_entity_lookup_fails_and_entity_is_not_found()
+    {
+        _mockHttpMessageHandler.SetResponder(req => req.RequestUri!.AbsolutePath.Contains("/underenheter/")
+            ? new HttpResponseMessage(HttpStatusCode.InternalServerError)
+            : new HttpResponseMessage(HttpStatusCode.NotFound));
+
+        var result = await _brregClient.GetOrganization("123456789");
+
+        Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.LookupFailed));
+    }
+
+    [Test]
+    public async Task GetOrganization_should_return_main_entity_when_sub_entity_lookup_fails()
+    {
+        _mockHttpMessageHandler.SetResponder(BuildEntityWithSubEntitiesResponder(subEntityCount: 0, subEntityStatus: HttpStatusCode.InternalServerError));
+
+        var result = await _brregClient.GetOrganization("312954672");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.Ok));
+            Assert.That(result.Type, Is.EqualTo(EntityType.Main));
+        });
+    }
+
+    [Test]
+    public async Task GetOrganization_should_return_LookupFailed_when_main_entity_of_sub_entity_lookup_fails()
+    {
+        _mockHttpMessageHandler.SetResponder(req =>
+        {
+            if (req.RequestUri!.AbsolutePath.Contains("/underenheter/"))
+            {
+                var sub = JsonSerializer.Serialize(new
+                {
+                    organisasjonsnummer = "111111111",
+                    navn = "Underenhet",
+                    organisasjonsform = new { kode = "BEDR", beskrivelse = "Bedrift" },
+                    overordnetEnhet = "987654321"
+                });
+                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(sub) };
+            }
+            return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+        });
+
+        var result = await _brregClient.GetOrganization("111111111");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.LookupFailed));
+            Assert.That(result.Type, Is.EqualTo(EntityType.Sub));
+            Assert.That(result.OverordnetOrganisasjonsform, Is.Null);
+        });
+    }
+
+    [Test]
+    public async Task GetOrganization_should_return_OrganizationDeleted_when_sub_entity_deletion_date_is_in_past()
     {
         var pastDate = DateTime.Now.AddDays(-30).ToString("yyyy-MM-dd");
         var mockData = JsonSerializer.Serialize(new
@@ -230,13 +345,46 @@ public class BrregClientTests
             Content = new StringContent(mockData)
         });
 
-        var status = await _brregClient.GetOrganizationStatus("987654321");
+        var result = await _brregClient.GetOrganization("123456789");
 
-        Assert.That(status, Is.EqualTo(BrregOrganizationStatus.Deleted));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.OrganizationDeleted));
+            Assert.That(result.Type, Is.EqualTo(EntityType.Sub));
+            Assert.That(result.Navn, Is.EqualTo("Slettet bedrift"));
+        });
     }
 
     [Test]
-    public async Task GetOrganizationStatus_should_return_SubEntity_when_deletion_date_is_in_future()
+    public async Task GetOrganization_should_return_OrganizationDeleted_when_main_entity_deletion_date_is_in_past()
+    {
+        var pastDate = DateTime.Now.AddDays(-30).ToString("yyyy-MM-dd");
+        _mockHttpMessageHandler.SetResponder(req =>
+        {
+            if (req.RequestUri!.AbsolutePath.Contains("/underenheter"))
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+
+            var entity = JsonSerializer.Serialize(new
+            {
+                organisasjonsnummer = "987654321",
+                navn = "Slettet AS",
+                slettedato = pastDate
+            });
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(entity) };
+        });
+
+        var result = await _brregClient.GetOrganization("987654321");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.OrganizationDeleted));
+            Assert.That(result.Type, Is.EqualTo(EntityType.Main));
+            Assert.That(result.Underenheter, Is.Null);
+        });
+    }
+
+    [Test]
+    public async Task GetOrganization_should_return_Ok_sub_entity_when_deletion_date_is_in_future()
     {
         var futureDate = DateTime.Now.AddDays(30).ToString("yyyy-MM-dd");
         var mockData = JsonSerializer.Serialize(new
@@ -251,32 +399,32 @@ public class BrregClientTests
             Content = new StringContent(mockData)
         });
 
-        var status = await _brregClient.GetOrganizationStatus("123456789");
+        var result = await _brregClient.GetOrganization("123456789");
 
-        Assert.That(status, Is.EqualTo(BrregOrganizationStatus.SubEntity));
-    }
-    
-    [Test]
-    public async Task GetOrganizationStatus_should_return_EntityWithSubEntities_when_sub_entities_exist()
-    {
-        _mockHttpMessageHandler.SetResponder(BuildEntityWithSubEntitiesResponder(subEntityCount: 1));
-
-        var status = await _brregClient.GetOrganizationStatus("312954672");
-
-        Assert.That(status, Is.EqualTo(BrregOrganizationStatus.EntityWithSubEntities));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.Ok));
+            Assert.That(result.Type, Is.EqualTo(EntityType.Sub));
+        });
     }
 
     [Test]
-    public async Task GetOrganizationStatus_should_return_EntityWithoutSubEntities_when_sub_entity_list_is_empty()
+    public async Task GetOrganization_should_return_main_entity_with_sub_entities()
     {
-        _mockHttpMessageHandler.SetResponder(BuildEntityWithSubEntitiesResponder(subEntityCount: 0));
+        _mockHttpMessageHandler.SetResponder(BuildEntityWithSubEntitiesResponder(subEntityCount: 2));
 
-        var status = await _brregClient.GetOrganizationStatus("312954672");
+        var result = await _brregClient.GetOrganization("312954672");
 
-        Assert.That(status, Is.EqualTo(BrregOrganizationStatus.EntityWithoutSubEntities));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.LookupStatus, Is.EqualTo(LookupStatus.Ok));
+            Assert.That(result.Type, Is.EqualTo(EntityType.Main));
+            Assert.That(result.Underenheter, Has.Count.EqualTo(2));
+        });
     }
 
-    private static Func<HttpRequestMessage, HttpResponseMessage> BuildEntityWithSubEntitiesResponder(int subEntityCount)
+    private static Func<HttpRequestMessage, HttpResponseMessage> BuildEntityWithSubEntitiesResponder(
+        int subEntityCount, HttpStatusCode subEntityStatus = HttpStatusCode.NotFound)
     {
         return req =>
         {
@@ -295,7 +443,7 @@ public class BrregClientTests
 
             // the org itself is not a sub entity
             if (req.RequestUri.AbsolutePath.Contains("/underenheter/"))
-                return new HttpResponseMessage(HttpStatusCode.NotFound);
+                return new HttpResponseMessage(subEntityStatus);
 
             // active main entity
             var entity = JsonSerializer.Serialize(new
@@ -306,65 +454,6 @@ public class BrregClientTests
             return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(entity) };
         };
     }
-
-    [Test]
-      public async Task GetLegalOrgForm_returns_form_directly_for_hovedenhet()
-      {
-          _mockHttpMessageHandler.SetResponder(req =>
-          {
-              // /underenheter/{org} -> 404 (actor is a main entity)
-              if (req.RequestUri!.AbsolutePath.Contains("/underenheter/"))
-                  return new HttpResponseMessage(HttpStatusCode.NotFound);
-
-              // /enheter/{org} -> entity with organisasjonsform
-              var json = JsonSerializer.Serialize(new
-              {
-                  organisasjonsnummer = "987654321",
-                  navn = "Ola Nordmann",
-                  organisasjonsform = new { kode = "ENK", beskrivelse = "Enkeltpersonforetak" }
-              });
-              return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(json) };
-          });
-
-          var result = await _brregClient.GetLegalOrgForm("987654321");
-
-          Assert.That(result, Is.Not.Null);
-          Assert.That(result!.Code, Is.EqualTo("ENK"));
-      }
-
-      [Test]
-      public async Task GetLegalOrgForm_resolves_hovedenhet_when_actor_is_underenhet()
-      {
-          _mockHttpMessageHandler.SetResponder(req =>
-          {
-              if (req.RequestUri!.AbsolutePath.Contains("/underenheter/"))
-              {
-                  // sub entity: own form is BEDR, but it points at its parent
-                  var sub = JsonSerializer.Serialize(new
-                  {
-                      organisasjonsnummer = "111111111",
-                      navn = "Underenhet",
-                      organisasjonsform = new { kode = "BEDR", beskrivelse = "Bedrift" },
-                      overordnetEnhet = "987654321"
-                  });
-                  return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(sub) };
-              }
-
-              // ain entity carries the legal form
-              var entity = JsonSerializer.Serialize(new
-              {
-                  organisasjonsnummer = "987654321",
-                  navn = "Ola Nordmann",
-                  organisasjonsform = new { kode = "ENK", beskrivelse = "Enkeltpersonforetak" }
-              });
-              return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(entity) };
-          });
-  
-          var result = await _brregClient.GetLegalOrgForm("111111111");
-
-          Assert.That(result, Is.Not.Null);
-          Assert.That(result!.Code, Is.EqualTo("ENK"));
-      }
 
     [TearDown]
     public void TearDown()

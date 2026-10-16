@@ -4,24 +4,10 @@ namespace DsbNorge.A3Forms.Clients.Brreg;
 
 public interface IBrregClient
 {
-    public Task<BrregOrganizationStatus> GetOrganizationStatus(string organizationNumber);
-    public Task<BrregOrgForm?> GetOrgForm(string code);
-    [Obsolete("GetOrg is deprecated. Use GetEntity instead.")]
-    public Task<BrregOrg?> GetOrg(string organizationNumber);
-
-    public Task<BrregOrg?> GetEntity(string organizationNumber);
-    public Task<BrregSubEntity?> GetSubEntity(string organizationNumber);
-
     /// <summary>
-    /// Returns the sub entities (underenheter) of the given main entity.
-    /// Returns an empty list when the entity has no sub entities, and null when the lookup fails.
+    /// Returns the organization, whether it is a main entity (hovedenhet) or a sub entity (underenhet).
+    /// Main entities include their sub entities, sub entities include the org form of their main entity.
+    /// Never returns null; check <see cref="BrregOrganization.LookupStatus"/> for not found, deleted or failed lookups.
     /// </summary>
-    public Task<List<BrregSubEntity>?> GetSubEntities(string organizationNumber);
-    
-    /// <summary>
-    /// Returns the legal organisasjonsform (ENK, AS, NUF, ...) of the actor.
-    /// Underenheter always have form BEDR/AAFY, so when the org is an underenhet
-    /// this resolves and returns the form of its hovedenhet (overordnetEnhet).
-    /// </summary>
-    public Task<BrregOrgForm?> GetLegalOrgForm(string organizationNumber);
+    public Task<BrregOrganization> GetOrganization(string organizationNumber);
 }

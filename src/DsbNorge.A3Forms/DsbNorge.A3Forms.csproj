@@ -21,10 +21,10 @@
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Altinn.App.Api" Version="[8.12.16]">
+    <PackageReference Include="Altinn.App.Api" Version="[8.12.17]">
       <CopyToOutputDirectory>lib\$(TargetFramework)\*.xml</CopyToOutputDirectory>
     </PackageReference>
-    <PackageReference Include="Altinn.App.Core" Version="[8.12.16]" />
+    <PackageReference Include="Altinn.App.Core" Version="[8.12.17]" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="[9.0.23]" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="[9.0.6]" />
     <PackageReference Update="Microsoft.SourceLink.GitHub" Version="[8.0.0]">
